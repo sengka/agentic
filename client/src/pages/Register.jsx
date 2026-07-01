@@ -1,0 +1,77 @@
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      localStorage.setItem("token", res.data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Kayıt başarısız, tekrar dene");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="bg-gray-900 p-8 rounded-2xl w-full max-w-md shadow-xl">
+        <h1 className="text-3xl font-bold text-white mb-2">Agentic</h1>
+        <p className="text-gray-400 mb-8">Hesabını oluştur</p>
+
+        {error && <p className="text-red-400 mb-4">{error}</p>}
+
+        <form onSubmit={handleRegister} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Ad Soyad"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-gray-800 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-gray-800 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <input
+            type="password"
+            placeholder="Şifre"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-gray-800 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition"
+          >
+            Kayıt Ol
+          </button>
+        </form>
+
+        <p className="text-gray-400 mt-4 text-center">
+          Zaten hesabın var mı?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-indigo-400 cursor-pointer hover:underline"
+          >
+            Giriş Yap
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
