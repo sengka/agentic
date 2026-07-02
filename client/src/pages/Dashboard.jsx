@@ -4,6 +4,7 @@ import axios from "axios";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
+  const [agents, setAgents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +23,12 @@ export default function Dashboard() {
         localStorage.removeItem("token");
         navigate("/login");
       });
+
+    axios
+      .get("http://localhost:5000/api/agents", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setAgents(res.data));
   }, []);
 
   const handleLogout = () => {
@@ -33,28 +40,50 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-950 text-white">
       <nav className="bg-gray-900 px-8 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold text-indigo-400">Agentic</h1>
-        <button
-          onClick={handleLogout}
-          className="text-gray-400 hover:text-white transition"
-        >
+        <button onClick={handleLogout} className="text-gray-400 hover:text-white transition">
           Çıkış Yap
         </button>
       </nav>
 
       <div className="max-w-4xl mx-auto px-8 py-12">
-        <h2 className="text-3xl font-bold mb-2">
-          Hoş geldin 👋
-        </h2>
-        <p className="text-gray-400 mb-12">
-          Agent'larını oluştur ve yönet
-        </p>
+        <h2 className="text-3xl font-bold mb-2">Hoş geldin 👋</h2>
+        <p className="text-gray-400 mb-8">Agent'larını oluştur ve yönet</p>
 
-        <div className="bg-gray-900 rounded-2xl p-8 text-center border border-gray-800">
-          <p className="text-gray-400 text-lg mb-4">Henüz bir agent yok</p>
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition">
-            + Yeni Agent Oluştur
-          </button>
-        </div>
+        <button
+          onClick={() => navigate("/create-agent")}
+          className="mb-8 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+        >
+          + Yeni Agent Oluştur
+        </button>
+
+        {agents.length === 0 ? (
+          <div className="bg-gray-900 rounded-2xl p-8 text-center border border-gray-800">
+            <p className="text-gray-400 text-lg">Henüz bir agent yok</p>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {agents.map((agent) => (
+              <div key={agent._id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-xl font-bold text-white">{agent.name}</h3>
+                    <p className="text-gray-400 mt-1">{agent.description}</p>
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {agent.topics.map((topic, i) => (
+                        <span key={i} className="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full text-sm">
+                          {topic}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-sm ${agent.isActive ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"}`}>
+                    {agent.isActive ? "Aktif" : "Pasif"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
