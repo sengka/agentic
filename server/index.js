@@ -14,7 +14,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 const authRoutes = require('./src/routes/authRoutes');
 app.use('/api/auth', authRoutes);
+const agentRoutes = require('./src/routes/agentRoutes');
 
+app.use('/api/agents', agentRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Agentic API çalışıyor 🚀' });
 });
