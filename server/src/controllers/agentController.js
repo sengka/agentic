@@ -37,4 +37,42 @@ const getAgents = async (req, res) => {
   }
 };
 
-module.exports = { createAgent, getAgents };
+const addSource = async (req, res) => {
+  try {
+    const { source } = req.body;
+    const agent = await Agent.findOne({ _id: req.params.id, user: req.user.id });
+    
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent bulunamadı' });
+    }
+
+    if (!agent.sources.includes(source)) {
+      agent.sources.push(source);
+      await agent.save();
+    }
+
+    res.json({ message: 'Kaynak eklendi', agent });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+};
+
+const removeSource = async (req, res) => {
+  try {
+    const { source } = req.body;
+    const agent = await Agent.findOne({ _id: req.params.id, user: req.user.id });
+
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent bulunamadı' });
+    }
+
+    agent.sources = agent.sources.filter(s => s !== source);
+    await agent.save();
+
+    res.json({ message: 'Kaynak silindi', agent });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource };

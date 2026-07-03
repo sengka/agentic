@@ -63,25 +63,46 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-4">
             {agents.map((agent) => (
-              <div key={agent._id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">{agent.name}</h3>
-                    <p className="text-gray-400 mt-1">{agent.description}</p>
-                    <div className="flex gap-2 mt-3 flex-wrap">
-                      {agent.topics.map((topic, i) => (
-                        <span key={i} className="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full text-sm">
-                          {topic}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-sm ${agent.isActive ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"}`}>
-                    {agent.isActive ? "Aktif" : "Pasif"}
-                  </span>
-                </div>
-              </div>
-            ))}
+  <div key={agent._id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-xl font-bold text-white">{agent.name}</h3>
+        <p className="text-gray-400 mt-1">{agent.description}</p>
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {agent.topics.map((topic, i) => (
+            <span key={i} className="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full text-sm">
+              {topic}
+            </span>
+          ))}
+        </div>
+      </div>
+      <span className={`px-3 py-1 rounded-full text-sm ${agent.isActive ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"}`}>
+        {agent.isActive ? "Aktif" : "Pasif"}
+      </span>
+    </div>
+
+    <div className="border-t border-gray-800 pt-4">
+      <p className="text-gray-400 text-sm mb-2">Kaynaklar:</p>
+      {agent.sources.length === 0 ? (
+        <p className="text-gray-600 text-sm">Henüz kaynak eklenmemiş</p>
+      ) : (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {agent.sources.map((source, i) => (
+            <span key={i} className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm">
+              {source}
+            </span>
+          ))}
+        </div>
+      )}
+      <button
+        onClick={() => navigate(`/agent/${agent._id}/sources`)}
+        className="text-indigo-400 hover:text-indigo-300 text-sm transition"
+      >
+        + Kaynak Ekle
+      </button>
+    </div>
+  </div>
+))}
           </div>
         )}
       </div>
