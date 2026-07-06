@@ -22,6 +22,18 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+const cron = require('node-cron');
+const { runAgent } = require('./src/services/agentRunner');
+const Agent = require('./src/models/Agent');
+
+// Her sabah 07:00'de çalışır
+cron.schedule('0 7 * * *', async () => {
+  console.log('Günlük agent çalışması başlıyor...');
+  const agents = await Agent.find({ isActive: true });
+  for (const agent of agents) {
+    await runAgent(agent._id);
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server ${PORT} portunda çalışıyor`);
