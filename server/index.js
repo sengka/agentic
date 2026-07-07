@@ -21,6 +21,9 @@ app.get('/', (req, res) => {
   res.json({ message: 'Agentic API çalışıyor 🚀' });
 });
 
+const reportRoutes = require('./src/routes/reportRoutes');
+app.use('/api/reports', reportRoutes);
+
 const PORT = process.env.PORT || 5000;
 const cron = require('node-cron');
 const { runAgent } = require('./src/services/agentRunner');
