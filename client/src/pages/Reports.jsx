@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useTheme } from "../ThemeContext";
+
+const cleanText = (text) => {
+  if (!text) return "";
+  return text.replace(/\*\*/g, "").replace(/\*/g, "").trim();
+};
 
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isDark, setIsDark } = useTheme();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -26,38 +33,41 @@ export default function Reports() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+    <div className={`min-h-screen ${isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"} flex items-center justify-center`}>
       Yükleniyor...
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <nav className="bg-gray-900 px-8 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-indigo-400">Agentic</h1>
-        <button onClick={() => navigate("/dashboard")} className="text-gray-400 hover:text-white">
-          Dashboard
-        </button>
+    <div className={`min-h-screen ${isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"}`}>
+      <nav className={`${isDark ? "bg-gray-900" : "bg-white border-b border-gray-200"} px-8 py-4 flex justify-between items-center`}>
+        <h1 className="text-xl font-bold text-indigo-500">Agentic</h1>
+        <div className="flex gap-4 items-center">
+          <button onClick={() => navigate("/dashboard")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
+            Dashboard
+          </button>
+          <button onClick={() => setIsDark(!isDark)} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
+            {isDark ? "☀️" : "🌙"}
+          </button>
+        </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-8 py-12">
         <h2 className="text-3xl font-bold mb-2">Raporlar</h2>
-        <p className="text-gray-400 mb-8">Agent'larının oluşturduğu günlük özetler</p>
+        <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mb-8`}>Agent'larının oluşturduğu günlük özetler</p>
 
         {reports.length === 0 ? (
-          <div className="bg-gray-900 rounded-2xl p-8 text-center border border-gray-800">
-            <p className="text-gray-400">Henüz rapor yok</p>
+          <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-8 text-center border`}>
+            <p className={isDark ? "text-gray-400" : "text-gray-500"}>Henüz rapor yok</p>
           </div>
         ) : (
           <div className="space-y-6">
             {reports.map((report) => (
-              <div key={report._id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+              <div key={report._id} className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-6 border`}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white">
-                      {report.agent?.name || "Agent"}
-                    </h3>
-                    <p className="text-gray-500 text-sm mt-1">
+                    <h3 className="text-xl font-bold">{report.agent?.name || "Agent"}</h3>
+                    <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-sm mt-1`}>
                       {new Date(report.createdAt).toLocaleDateString("tr-TR", {
                         day: "numeric",
                         month: "long",
@@ -69,10 +79,14 @@ export default function Reports() {
                   </div>
                 </div>
 
-                <div className="bg-gray-800 rounded-xl p-4 mb-4">
-                  <p className="text-gray-300 text-sm leading-relaxed">{report.dailySummary}</p>
+                <div className={`${isDark ? "bg-gray-800" : "bg-gray-50 border border-gray-200"} rounded-xl p-4 mb-4`}>
+                  <p className="text-sm font-semibold text-indigo-400 mb-2">📋 Günlük Özet</p>
+                  <p className={`${isDark ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed`}>
+                    {cleanText(report.dailySummary)}
+                  </p>
                 </div>
 
+                <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm font-semibold mb-3`}>📰 Haberler</p>
                 <div className="space-y-2">
                   {report.items.map((item, i) => (
                     <a
@@ -80,10 +94,10 @@ export default function Reports() {
                       href={item.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block bg-gray-800 hover:bg-gray-700 rounded-xl px-4 py-3 transition"
+                      className={`block ${isDark ? "bg-gray-800 hover:bg-gray-700" : "bg-gray-50 hover:bg-gray-100 border border-gray-200"} rounded-xl px-4 py-3 transition`}
                     >
-                      <p className="text-white text-sm">{item.title}</p>
-                      <p className="text-gray-500 text-xs mt-1">{item.source}</p>
+                      <p className={`${isDark ? "text-white" : "text-gray-900"} text-sm font-medium`}>{item.title}</p>
+                      <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-xs mt-1`}>{item.source}</p>
                     </a>
                   ))}
                 </div>
