@@ -37,11 +37,18 @@ const runAgent = async (agentId) => {
       })
     );
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    const titlesText = itemsWithEmbeddings.map(i => `- ${i.title}`).join('\n');
-    const prompt = `Aşağıdaki içerikleri Türkçe olarak 3-4 cümleyle özetle:\n${titlesText}`;
-    const result = await model.generateContent(prompt);
-    const dailySummary = result.response.text();
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+const titlesText = itemsWithEmbeddings.map(i => `- ${i.title}`).join('\n');
+const prompt = `Aşağıdaki içerikleri Türkçe olarak 3-4 cümleyle özetle:\n${titlesText}`;
+
+let dailySummary;
+try {
+  const result = await model.generateContent(prompt);
+  dailySummary = result.response.text();
+} catch (error) {
+  console.error('Gemini özet hatası:', error.message);
+  dailySummary = 'Özet oluşturulamadı (Gemini API hatası).';
+}
 
     const report = new Report({
       agent: agent._id,
