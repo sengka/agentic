@@ -13,7 +13,8 @@ const { runAgent } = require('../services/agentRunner');
 
 router.post('/:id/run', protect, async (req, res) => {
   try {
-    const report = await runAgent(req.params.id);
+    const io = req.app.get('io');
+    const report = await runAgent(req.params.id, io);
     res.json({ message: 'Agent çalıştırıldı', report });
   } catch (error) {
     res.status(500).json({ message: 'Hata', error: error.message });

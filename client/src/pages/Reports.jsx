@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { io } from "socket.io-client";
 import { useTheme } from "../ThemeContext";
 
 const cleanText = (text) => {
@@ -8,19 +9,24 @@ const cleanText = (text) => {
   return text.replace(/\*\*/g, "").replace(/\*/g, "").trim();
 };
 
+const statusLabels = {
+  scraping: "🔍 Kaynaklar taranıyor...",
+  embedding: "🧠 Embedding oluşturuluyor...",
+  summarizing: "✍️ Özet yazılıyor...",
+  done: "✅ Rapor hazır!",
+  error: "❌ Hata oluştu",
+  failed: "⚠️ İçerik bulunamadı",
+};
+
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [agentStatus, setAgentStatus] = useState(null);
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
-  useEffect(() => {
+  const fetchReports = () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
     axios
       .get("http://localhost:5000/api/reports", {
         headers: { Authorization: `Bearer ${token}` },
@@ -30,6 +36,41 @@ export default function Reports() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    fetchReports();
+
+    // Socket.io bağlantısı
+    const socket = io("http://localhost:5000");
+
+    socket.on("connect", () => {
+      console.log("Socket bağlandı:", socket.id);
+    });
+
+    socket.on("agentStatus", (data) => {
+      console.log("Agent durumu:", data);
+      setAgentStatus(data);
+
+      // Rapor tamamlandığında listeyi yenile, birkaç saniye sonra durum mesajını kaldır
+      if (data.status === "done") {
+        fetchReports();
+        setTimeout(() => setAgentStatus(null), 4000);
+      }
+      if (data.status === "error" || data.status === "failed") {
+        setTimeout(() => setAgentStatus(null), 4000);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   if (loading) return (
@@ -55,6 +96,14 @@ export default function Reports() {
       <div className="max-w-4xl mx-auto px-8 py-12">
         <h2 className="text-3xl font-bold mb-2">Raporlar</h2>
         <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mb-8`}>Agent'larının oluşturduğu günlük özetler</p>
+
+        {agentStatus && (
+          <div className={`${isDark ? "bg-indigo-950 border-indigo-800" : "bg-indigo-50 border-indigo-200"} rounded-xl p-4 mb-6 border flex items-center gap-2`}>
+            <span className="text-sm font-medium">
+              {statusLabels[agentStatus.status] || agentStatus.message}
+            </span>
+          </div>
+        )}
 
         {reports.length === 0 ? (
           <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-8 text-center border`}>

@@ -1,4 +1,7 @@
+
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
@@ -26,9 +29,29 @@ app.use('/api/reports', reportRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-const { startScheduler } = require('./src/services/scheduler');
-startScheduler();
+// HTTP server'ı Express'ten ayrı oluşturuyoruz ki socket.io ona bağlanabilsin
+const server = http.createServer(app);
 
-app.listen(PORT, () => {
+const io = new Server(server, {
+  cors: {
+    origin: '*', // geliştirme aşamasında hepsine izin, prod'da frontend URL'i ile sınırlarız
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log('Yeni socket bağlantısı:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('Socket bağlantısı koptu:', socket.id);
+  });
+});
+
+// io nesnesini diğer dosyalardan erişilebilir yapıyoruz (agentRunner içinde kullanacağız)
+app.set('io', io);
+
+const { startScheduler } = require('./src/services/scheduler');
+startScheduler(io);
+
+server.listen(PORT, () => {
   console.log(`Server ${PORT} portunda çalışıyor`);
 });
