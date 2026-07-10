@@ -3,6 +3,8 @@ const { getEmbedding } = require('./embeddingService');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Report = require('../models/Report');
 const Agent = require('../models/Agent');
+const User = require('../models/User');
+const { sendReportEmail } = require('./emailService');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -63,9 +65,14 @@ const runAgent = async (agentId, io) => {
       dailySummary
     });
 
-    await report.save();
+await report.save();
     console.log(`Rapor oluşturuldu: ${agent.name}`);
     if (io) io.emit('agentStatus', { agentId, status: 'done', message: 'Rapor hazır', reportId: report._id });
+
+    const user = await User.findById(agent.user);
+    if (user?.email) {
+      await sendReportEmail(user.email, agent.name, dailySummary);
+    }
 
     return report;
 
