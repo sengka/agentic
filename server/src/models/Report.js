@@ -19,8 +19,13 @@ const reportSchema = new mongoose.Schema({
     embedding: [Number],
     publishedAt: Date
   }],
-  dailySummary: {
+dailySummary: {
     type: String
+  },
+  feedback: {
+    type: String,
+    enum: ['like', 'dislike', null],
+    default: null
   },
   createdAt: {
     type: Date,

@@ -38,6 +38,22 @@ export default function Reports() {
       .catch(() => setLoading(false));
   };
 
+  const handleFeedback = async (reportId, feedback) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api/reports/${reportId}/feedback`,
+        { feedback },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setReports((prev) =>
+        prev.map((r) => (r._id === reportId ? { ...r, feedback: res.data.feedback } : r))
+      );
+    } catch (err) {
+      console.error("Feedback hatası:", err.message);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -47,7 +63,6 @@ export default function Reports() {
 
     fetchReports();
 
-    // Socket.io bağlantısı
     const socket = io("http://localhost:5000");
 
     socket.on("connect", () => {
@@ -58,7 +73,6 @@ export default function Reports() {
       console.log("Agent durumu:", data);
       setAgentStatus(data);
 
-      // Rapor tamamlandığında listeyi yenile, birkaç saniye sonra durum mesajını kaldır
       if (data.status === "done") {
         fetchReports();
         setTimeout(() => setAgentStatus(null), 4000);
@@ -133,6 +147,33 @@ export default function Reports() {
                   <p className={`${isDark ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed`}>
                     {cleanText(report.dailySummary)}
                   </p>
+                </div>
+
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => handleFeedback(report._id, report.feedback === "like" ? null : "like")}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                      report.feedback === "like"
+                        ? "bg-green-600 text-white"
+                        : isDark
+                        ? "bg-gray-800 text-gray-400 hover:text-white"
+                        : "bg-gray-100 text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    👍 Beğendim
+                  </button>
+                  <button
+                    onClick={() => handleFeedback(report._id, report.feedback === "dislike" ? null : "dislike")}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                      report.feedback === "dislike"
+                        ? "bg-red-600 text-white"
+                        : isDark
+                        ? "bg-gray-800 text-gray-400 hover:text-white"
+                        : "bg-gray-100 text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    👎 Beğenmedim
+                  </button>
                 </div>
 
                 <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm font-semibold mb-3`}>📰 Haberler</p>
