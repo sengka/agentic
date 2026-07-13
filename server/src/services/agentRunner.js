@@ -16,13 +16,16 @@ const runAgent = async (agentId, io) => {
     console.log(`Agent çalışıyor: ${agent.name}`);
     if (io) io.emit('agentStatus', { agentId, status: 'scraping', message: 'Kaynaklar taranıyor...' });
 
-    const allItems = [];
-
-    for (const source of agent.sources) {
-      const items = await scrapeSource(source);
-      items.forEach(item => item.source = source);
-      allItems.push(...items);
-    }
+    // Kaynakları paralel olarak tara (sıralı yerine)
+    const results = await Promise.all(
+      agent.sources.map(async (source) => {
+        const items = await scrapeSource(source);
+        items.forEach(item => item.source = source);
+        return items;
+      })
+    );
+    const allItems = results.flat();
+     console.log('Kaynak başına haber sayısı:', results.map((r, i) => `${agent.sources[i]}: ${r.length}`));
 
     if (allItems.length === 0) {
       console.log('Hiç içerik bulunamadı');
@@ -31,9 +34,26 @@ const runAgent = async (agentId, io) => {
     }
 
     if (io) io.emit('agentStatus', { agentId, status: 'embedding', message: 'Embedding oluşturuluyor...' });
+// Her kaynaktan adil şekilde haber almak için kaynaklara göre grupla
+    const itemsBySource = {};
+    allItems.forEach(item => {
+      if (!itemsBySource[item.source]) itemsBySource[item.source] = [];
+      itemsBySource[item.source].push(item);
+    });
+
+    const balancedItems = [];
+    const sourceKeys = Object.keys(itemsBySource);
+    let index = 0;
+    while (balancedItems.length < 5 && balancedItems.length < allItems.length) {
+      const key = sourceKeys[index % sourceKeys.length];
+      if (itemsBySource[key].length > 0) {
+        balancedItems.push(itemsBySource[key].shift());
+      }
+      index++;
+    }
 
     const itemsWithEmbeddings = await Promise.all(
-      allItems.slice(0, 5).map(async (item) => {
+      balancedItems.map(async (item) => {
         try {
           const embedding = await getEmbedding(item.title + ' ' + item.summary);
           return { ...item, embedding };
@@ -65,7 +85,7 @@ const runAgent = async (agentId, io) => {
       dailySummary
     });
 
-await report.save();
+    await report.save();
     console.log(`Rapor oluşturuldu: ${agent.name}`);
     if (io) io.emit('agentStatus', { agentId, status: 'done', message: 'Rapor hazır', reportId: report._id });
 
