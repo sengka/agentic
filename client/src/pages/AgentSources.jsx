@@ -6,6 +6,8 @@ export default function AgentSources() {
   const { id } = useParams();
   const [agent, setAgent] = useState(null);
   const [newSource, setNewSource] = useState("");
+  const [testResult, setTestResult] = useState(null);
+  const [testing, setTesting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,8 +33,28 @@ export default function AgentSources() {
       );
       setAgent(res.data.agent);
       setNewSource("");
+      setTestResult(null);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleTestSource = async () => {
+    if (!newSource.trim()) return;
+    const token = localStorage.getItem("token");
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/agents/test-source`,
+        { source: newSource },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTestResult(res.data);
+    } catch (err) {
+      setTestResult({ success: false, message: "Test sırasında hata oluştu" });
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -73,9 +95,19 @@ export default function AgentSources() {
               type="text"
               placeholder="https://techcrunch.com"
               value={newSource}
-              onChange={(e) => setNewSource(e.target.value)}
+              onChange={(e) => {
+                setNewSource(e.target.value);
+                setTestResult(null);
+              }}
               className="flex-1 bg-gray-800 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
             />
+            <button
+              onClick={handleTestSource}
+              disabled={testing || !newSource.trim()}
+              className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-semibold transition"
+            >
+              {testing ? "Test ediliyor..." : "Test Et"}
+            </button>
             <button
               onClick={handleAddSource}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
@@ -83,6 +115,19 @@ export default function AgentSources() {
               Ekle
             </button>
           </div>
+
+          {testResult && (
+            <div className={`mt-4 rounded-xl p-4 text-sm ${testResult.success ? "bg-green-950 border border-green-800 text-green-300" : "bg-red-950 border border-red-800 text-red-300"}`}>
+              <p className="font-semibold mb-1">{testResult.success ? "✅ " : "❌ "}{testResult.message}</p>
+              {testResult.sample && (
+                <ul className="mt-2 space-y-1 text-gray-300">
+                  {testResult.sample.map((title, i) => (
+                    <li key={i}>• {title}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">

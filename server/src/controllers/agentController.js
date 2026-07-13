@@ -1,5 +1,6 @@
 const Agent = require('../models/Agent');
 const { parseAgentFromText } = require('../services/geminiService');
+const { scrapeSource } = require('../services/scraperService');
 
 const createAgent = async (req, res) => {
   try {
@@ -75,4 +76,30 @@ const removeSource = async (req, res) => {
   }
 };
 
-module.exports = { createAgent, getAgents, addSource, removeSource };
+const testSource = async (req, res) => {
+  try {
+    const { source } = req.body;
+    if (!source) {
+      return res.status(400).json({ message: 'Kaynak URL gerekli' });
+    }
+
+    const items = await scrapeSource(source);
+
+    if (items.length === 0) {
+      return res.json({
+        success: false,
+        message: 'Bu kaynaktan içerik çekilemedi. URL yanlış olabilir veya kaynak erişime kapalı olabilir.',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${items.length} içerik bulundu`,
+      sample: items.slice(0, 3).map(i => i.title),
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Test sırasında hata oluştu', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource, testSource };
