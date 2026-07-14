@@ -110,7 +110,9 @@ export default function Reports() {
       <div className="max-w-4xl mx-auto px-8 py-12">
         <h2 className="text-3xl font-bold mb-2">Raporlar</h2>
         <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mb-8`}>Agent'larının oluşturduğu günlük özetler</p>
-
+<button onClick={() => navigate("/search")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
+  Ara
+</button>
         {agentStatus && (
           <div className={`${isDark ? "bg-indigo-950 border-indigo-800" : "bg-indigo-50 border-indigo-200"} rounded-xl p-4 mb-6 border flex items-center gap-2`}>
             <span className="text-sm font-medium">

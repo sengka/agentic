@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateAgent from "./pages/CreateAgent";
 import AgentSources from "./pages/AgentSources";
 import Reports from "./pages/Reports";
+import Search from "./pages/Search";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/create-agent" element={<CreateAgent />} />
         <Route path="/agent/:id/sources" element={<AgentSources />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/search" element={<Search />} />
       </Routes>
     </BrowserRouter>
   );
