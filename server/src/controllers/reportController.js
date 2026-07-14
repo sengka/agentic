@@ -1,5 +1,7 @@
 const Report = require('../models/Report');
 
+const { semanticSearch } = require('../services/searchService');
+
 const getReports = async (req, res) => {
   try {
     const reports = await Report.find({ user: req.user.id })
@@ -45,4 +47,19 @@ const updateFeedback = async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası', error: error.message });
   }
 };
-module.exports = { getReports, getReportsByAgent, updateFeedback };
+
+const searchReports = async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query || !query.trim()) {
+      return res.status(400).json({ message: 'Arama sorgusu gerekli' });
+    }
+
+    const results = await semanticSearch(req.user.id, query);
+    res.json({ results });
+  } catch (error) {
+    res.status(500).json({ message: 'Arama sırasında hata oluştu', error: error.message });
+  }
+};
+
+module.exports = { getReports, getReportsByAgent, updateFeedback, searchReports };
