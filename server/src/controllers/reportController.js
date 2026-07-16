@@ -1,6 +1,6 @@
 const Report = require('../models/Report');
 
-const { semanticSearch } = require('../services/searchService');
+const { semanticSearch, generateAnswer } = require('../services/searchService');
 
 const getReports = async (req, res) => {
   try {
@@ -56,7 +56,9 @@ const searchReports = async (req, res) => {
     }
 
     const results = await semanticSearch(req.user.id, query);
-    res.json({ results });
+    const answer = await generateAnswer(query, results);
+
+    res.json({ answer, results });
   } catch (error) {
     res.status(500).json({ message: 'Arama sırasında hata oluştu', error: error.message });
   }

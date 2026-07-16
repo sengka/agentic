@@ -1,5 +1,7 @@
 const { getEmbedding } = require('./embeddingService');
 const Report = require('../models/Report');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // İki vektör arasındaki cosine similarity'yi hesaplar (0-1 arası, 1 = tam eşleşme)
 const cosineSimilarity = (vecA, vecB) => {
@@ -48,5 +50,32 @@ const semanticSearch = async (userId, query, limit = 5) => {
 
   return scoredItems.slice(0, limit);
 };
+const generateAnswer = async (query, items) => {
+  if (items.length === 0) {
+    return 'Bu konuda geçmiş raporlarında herhangi bir bilgi bulunamadı.';
+  }
 
-module.exports = { semanticSearch };
+  const context = items
+    .map((item, i) => `${i + 1}. ${item.title}\n${item.summary || ''}`)
+    .join('\n\n');
+
+  const prompt = `Aşağıda kullanıcının geçmiş haber raporlarından bulunan en alakalı içerikler var. Bu içeriklere dayanarak kullanıcının sorusunu Türkçe, doğal ve akıcı bir dille cevapla. Sadece verilen içeriklerdeki bilgileri kullan, uydurma bilgi ekleme.
+
+Kullanıcının sorusu: "${query}"
+
+İlgili içerikler:
+${context}
+
+Cevap:`;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (error) {
+    console.error('Cevap üretme hatası:', error.message);
+    return 'Cevap üretilirken bir hata oluştu, ancak ilgili haberleri aşağıda bulabilirsin.';
+  }
+};
+
+module.exports = { semanticSearch, generateAnswer };

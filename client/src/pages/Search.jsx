@@ -6,12 +6,13 @@ import { useTheme } from "../ThemeContext";
 export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
-  const handleSearch = async () => {
+const handleSearch = async () => {
     if (!query.trim()) return;
     const token = localStorage.getItem("token");
     setLoading(true);
@@ -22,9 +23,11 @@ export default function Search() {
         { query },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setAnswer(res.data.answer || "");
       setResults(res.data.results || []);
     } catch (err) {
       console.error("Arama hatası:", err.message);
+      setAnswer("");
       setResults([]);
     } finally {
       setLoading(false);
@@ -76,12 +79,14 @@ export default function Search() {
           </button>
         </div>
 
-        {searched && !loading && results.length === 0 && (
-          <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-8 text-center border`}>
-            <p className={isDark ? "text-gray-400" : "text-gray-500"}>Sonuç bulunamadı</p>
+{answer && !loading && (
+          <div className={`${isDark ? "bg-indigo-950 border-indigo-800" : "bg-indigo-50 border-indigo-200"} rounded-2xl p-6 mb-8 border`}>
+            <p className="text-sm font-semibold text-indigo-400 mb-2">💡 Cevap</p>
+            <p className={`${isDark ? "text-gray-200" : "text-gray-800"} leading-relaxed whitespace-pre-line`}>
+              {answer}
+            </p>
           </div>
         )}
-
         {results.length > 0 && (
           <div className="space-y-4">
             {results.map((item, i) => (
