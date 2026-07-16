@@ -28,7 +28,9 @@ export default function CreateAgent() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <nav className="bg-gray-900 px-8 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-indigo-400">Agentic</h1>
+<button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
+  Agentic
+</button>
         <button onClick={() => navigate("/dashboard")} className="text-gray-400 hover:text-white">
           Geri
         </button>
@@ -53,6 +55,8 @@ export default function CreateAgent() {
           >
             {loading ? "AI analiz ediyor..." : "Agent Oluştur"}
           </button>
+
+          
         </div>
       </div>
     </div>
