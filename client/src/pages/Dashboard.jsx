@@ -1,14 +1,41 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { io } from "socket.io-client";
 import { useTheme } from "../ThemeContext";
+
+const statusLabels = {
+  scraping: "🔍 Kaynaklar taranıyor...",
+  embedding: "🧠 Embedding oluşturuluyor...",
+  summarizing: "✍️ Özet yazılıyor...",
+  done: "✅ Rapor hazır!",
+  error: "❌ Hata oluştu",
+  failed: "⚠️ İçerik bulunamadı",
+};
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [agents, setAgents] = useState([]);
   const [reports, setReports] = useState([]);
+  const [agentStatuses, setAgentStatuses] = useState({}); // { agentId: { status, message } }
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
+
+  const fetchAgents = (token) => {
+    axios
+      .get("http://localhost:5000/api/agents", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setAgents(res.data));
+  };
+
+  const fetchReports = (token) => {
+    axios
+      .get("http://localhost:5000/api/reports", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setReports(res.data));
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -27,17 +54,37 @@ export default function Dashboard() {
         navigate("/login");
       });
 
-    axios
-      .get("http://localhost:5000/api/agents", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setAgents(res.data));
+    fetchAgents(token);
+    fetchReports(token);
 
-    axios
-      .get("http://localhost:5000/api/reports", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setReports(res.data));
+    const socket = io("http://localhost:5000");
+
+    socket.on("agentStatus", (data) => {
+      setAgentStatuses((prev) => ({ ...prev, [data.agentId]: data }));
+
+      if (data.status === "done") {
+        fetchReports(token);
+        fetchAgents(token);
+        setTimeout(() => {
+          setAgentStatuses((prev) => {
+            const updated = { ...prev };
+            delete updated[data.agentId];
+            return updated;
+          });
+        }, 4000);
+      }
+      if (data.status === "error" || data.status === "failed") {
+        setTimeout(() => {
+          setAgentStatuses((prev) => {
+            const updated = { ...prev };
+            delete updated[data.agentId];
+            return updated;
+          });
+        }, 4000);
+      }
+    });
+
+    return () => socket.disconnect();
   }, []);
 
   const handleLogout = () => {
@@ -53,9 +100,23 @@ export default function Dashboard() {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Agent çalıştırıldı! Raporlar sayfasını kontrol et.");
     } catch (err) {
       alert("Hata oluştu");
+    }
+  };
+
+  const deleteAgent = async (agentId, agentName) => {
+    if (!window.confirm(`"${agentName}" adlı agent'ı silmek istediğine emin misin? Bu işlem geri alınamaz.`)) {
+      return;
+    }
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`http://localhost:5000/api/agents/${agentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAgents((prev) => prev.filter((a) => a._id !== agentId));
+    } catch (err) {
+      alert("Agent silinirken hata oluştu");
     }
   };
 
@@ -86,16 +147,16 @@ export default function Dashboard() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"}`}>
       <nav className={`${isDark ? "bg-gray-900" : "bg-white border-b border-gray-200"} px-8 py-4 flex justify-between items-center`}>
-<button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
-  Agentic
-</button>
+        <button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
+          Agentic
+        </button>
         <div className="flex gap-4 items-center">
           <button onClick={() => navigate("/reports")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
             Raporlar
           </button>
           <button onClick={() => navigate("/search")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
-  Ara
-</button>
+            Ara
+          </button>
           <button onClick={() => setIsDark(!isDark)} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
             {isDark ? "☀️" : "🌙"}
           </button>
@@ -144,6 +205,7 @@ export default function Dashboard() {
               const lastRun = agentReports.length
                 ? agentReports.reduce((latest, r) => (new Date(r.createdAt) > new Date(latest.createdAt) ? r : latest))
                 : null;
+              const liveStatus = agentStatuses[agent._id];
 
               return (
                 <div key={agent._id} className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-6 border`}>
@@ -173,12 +235,27 @@ export default function Dashboard() {
                       </span>
                       <button
                         onClick={() => runAgent(agent._id)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm transition"
+                        disabled={!!liveStatus && liveStatus.status !== "done" && liveStatus.status !== "error" && liveStatus.status !== "failed"}
+                        className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm transition"
                       >
                         ▶ Çalıştır
                       </button>
+                      <button
+                        onClick={() => deleteAgent(agent._id, agent.name)}
+                        className="text-red-400 hover:text-red-300 text-sm transition"
+                      >
+                        Sil
+                      </button>
                     </div>
                   </div>
+
+                  {liveStatus && (
+                    <div className={`${isDark ? "bg-indigo-950 border-indigo-800" : "bg-indigo-50 border-indigo-200"} rounded-xl p-3 mb-4 border`}>
+                      <p className="text-sm font-medium">
+                        {statusLabels[liveStatus.status] || liveStatus.message}
+                      </p>
+                    </div>
+                  )}
 
                   <div className={`border-t ${isDark ? "border-gray-800" : "border-gray-200"} pt-4`}>
                     <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm mb-2`}>Kaynaklar:</p>

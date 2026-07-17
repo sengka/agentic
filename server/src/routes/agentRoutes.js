@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createAgent, getAgents, addSource, removeSource, testSource } = require('../controllers/agentController');
+const { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent } = require('../controllers/agentController');
 const { protect } = require('../middleware/authMiddleware');
 
 
@@ -9,6 +9,7 @@ router.post('/test-source', protect, testSource);
 router.get('/', protect, getAgents);
 router.post('/:id/sources', protect, addSource);
 router.delete('/:id/sources', protect, removeSource);
+router.delete('/:id', protect, deleteAgent);
 
 const { runAgent } = require('../services/agentRunner');
 

@@ -102,4 +102,18 @@ if (items.length === 0) {
   }
 };
 
-module.exports = { createAgent, getAgents, addSource, removeSource, testSource };
+const deleteAgent = async (req, res) => {
+  try {
+    const agent = await Agent.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent bulunamadı' });
+    }
+
+    res.json({ message: 'Agent silindi' });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent };
