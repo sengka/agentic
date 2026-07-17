@@ -6,13 +6,13 @@ import { useTheme } from "../ThemeContext";
 export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
-const handleSearch = async () => {
+  const handleSearch = async () => {
     if (!query.trim()) return;
     const token = localStorage.getItem("token");
     setLoading(true);
@@ -23,11 +23,9 @@ const handleSearch = async () => {
         { query },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setAnswer(res.data.answer || "");
       setResults(res.data.results || []);
     } catch (err) {
       console.error("Arama hatası:", err.message);
-      setAnswer("");
       setResults([]);
     } finally {
       setLoading(false);
@@ -41,9 +39,9 @@ const handleSearch = async () => {
   return (
     <div className={`min-h-screen ${isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"}`}>
       <nav className={`${isDark ? "bg-gray-900" : "bg-white border-b border-gray-200"} px-8 py-4 flex justify-between items-center`}>
-<button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
-  Agentic
-</button>
+        <button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
+          Agentic
+        </button>
         <div className="flex gap-4 items-center">
           <button onClick={() => navigate("/dashboard")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
             Dashboard
@@ -81,14 +79,12 @@ const handleSearch = async () => {
           </button>
         </div>
 
-{answer && !loading && (
-          <div className={`${isDark ? "bg-indigo-950 border-indigo-800" : "bg-indigo-50 border-indigo-200"} rounded-2xl p-6 mb-8 border`}>
-            <p className="text-sm font-semibold text-indigo-400 mb-2">💡 Cevap</p>
-            <p className={`${isDark ? "text-gray-200" : "text-gray-800"} leading-relaxed whitespace-pre-line`}>
-              {answer}
-            </p>
+        {searched && !loading && results.length === 0 && (
+          <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-8 text-center border`}>
+            <p className={isDark ? "text-gray-400" : "text-gray-500"}>Sonuç bulunamadı</p>
           </div>
         )}
+
         {results.length > 0 && (
           <div className="space-y-4">
             {results.map((item, i) => (

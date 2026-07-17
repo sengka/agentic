@@ -85,12 +85,12 @@ const testSource = async (req, res) => {
 
     const items = await scrapeSource(source);
 
-    if (items.length === 0) {
-      return res.json({
-        success: false,
-        message: 'Bu kaynaktan içerik çekilemedi. URL yanlış olabilir veya kaynak erişime kapalı olabilir.',
-      });
-    }
+if (items.length === 0) {
+  return res.json({
+    success: false,
+    message: 'Bu kaynaktan güvenilir şekilde veri çekilemedi. Farklı bir haber kaynağı deneyebilir misin?',
+  });
+}
 
     res.json({
       success: true,

@@ -6,6 +6,7 @@ import CreateAgent from "./pages/CreateAgent";
 import AgentSources from "./pages/AgentSources";
 import Reports from "./pages/Reports";
 import Search from "./pages/Search";
+import ChatWidget from "./components/ChatWidget";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/search" element={<Search />} />
       </Routes>
+      <ChatWidget />
     </BrowserRouter>
   );
 }
