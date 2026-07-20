@@ -8,6 +8,22 @@ const { sendReportEmail } = require('./emailService');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Geçmiş feedback'lere göre her kaynağın puanını hesapla
+const getSourceScores = async (agentId) => {
+  const pastReports = await Report.find({ agent: agentId, feedback: { $ne: null } });
+  const scores = {};
+
+  pastReports.forEach((report) => {
+    const point = report.feedback === 'like' ? 1 : report.feedback === 'dislike' ? -1 : 0;
+    const sourcesInReport = new Set(report.items.map((item) => item.source));
+    sourcesInReport.forEach((source) => {
+      scores[source] = (scores[source] || 0) + point;
+    });
+  });
+
+  return scores;
+};
+
 const runAgent = async (agentId, io) => {
   try {
     const agent = await Agent.findById(agentId);
@@ -16,7 +32,6 @@ const runAgent = async (agentId, io) => {
     console.log(`Agent çalışıyor: ${agent.name}`);
     if (io) io.emit('agentStatus', { agentId, status: 'scraping', message: 'Kaynaklar taranıyor...' });
 
-    // Kaynakları paralel olarak tara (sıralı yerine)
     const results = await Promise.all(
       agent.sources.map(async (source) => {
         const items = await scrapeSource(source);
@@ -25,7 +40,6 @@ const runAgent = async (agentId, io) => {
       })
     );
     const allItems = results.flat();
-     console.log('Kaynak başına haber sayısı:', results.map((r, i) => `${agent.sources[i]}: ${r.length}`));
 
     if (allItems.length === 0) {
       console.log('Hiç içerik bulunamadı');
@@ -34,22 +48,40 @@ const runAgent = async (agentId, io) => {
     }
 
     if (io) io.emit('agentStatus', { agentId, status: 'embedding', message: 'Embedding oluşturuluyor...' });
-// Her kaynaktan adil şekilde haber almak için kaynaklara göre grupla
+
+    // Geçmiş feedback'e göre kaynak puanlarını al
+    const sourceScores = await getSourceScores(agentId);
+    console.log('Kaynak puanları:', sourceScores);
+
+    // Kaynaklara göre grupla
     const itemsBySource = {};
     allItems.forEach(item => {
       if (!itemsBySource[item.source]) itemsBySource[item.source] = [];
       itemsBySource[item.source].push(item);
     });
 
-    const balancedItems = [];
+    // Puanlı ağırlıklı sıra listesi oluştur: yüksek puanlı kaynak, sırada daha sık geçsin
     const sourceKeys = Object.keys(itemsBySource);
+    const weightedOrder = [];
+    sourceKeys.forEach((source) => {
+      const score = sourceScores[source] || 0;
+      // Puan -1'den düşükse bile en az 1 kez dahil et (çeşitlilik için), yüksek puan daha sık tekrar etsin
+      const weight = Math.max(1, score + 2);
+      for (let i = 0; i < weight; i++) weightedOrder.push(source);
+    });
+
+    const balancedItems = [];
     let index = 0;
-    while (balancedItems.length < 5 && balancedItems.length < allItems.length) {
-      const key = sourceKeys[index % sourceKeys.length];
-      if (itemsBySource[key].length > 0) {
+    const maxAttempts = weightedOrder.length * 5;
+    let attempts = 0;
+    while (balancedItems.length < 5 && attempts < maxAttempts) {
+      const key = weightedOrder[index % weightedOrder.length];
+      if (itemsBySource[key] && itemsBySource[key].length > 0) {
         balancedItems.push(itemsBySource[key].shift());
       }
       index++;
+      attempts++;
+      if (Object.values(itemsBySource).every(arr => arr.length === 0)) break;
     }
 
     const itemsWithEmbeddings = await Promise.all(
