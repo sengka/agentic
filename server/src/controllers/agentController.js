@@ -116,4 +116,18 @@ const deleteAgent = async (req, res) => {
   }
 };
 
-module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent };
+const toggleActive = async (req, res) => {
+  try {
+    const agent = await Agent.findOne({ _id: req.params.id, user: req.user.id });
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent bulunamadı' });
+    }
+    agent.isActive = !agent.isActive;
+    await agent.save();
+    res.json({ message: 'Durum güncellendi', agent });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive };

@@ -7,6 +7,7 @@ import AgentSources from "./pages/AgentSources";
 import Reports from "./pages/Reports";
 import Search from "./pages/Search";
 import ChatWidget from "./components/ChatWidget";
+import AgentReports from "./pages/AgentReports";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-agent" element={<CreateAgent />} />
         <Route path="/agent/:id/sources" element={<AgentSources />} />
+        <Route path="/agent/:id/reports" element={<AgentReports />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/search" element={<Search />} />
       </Routes>

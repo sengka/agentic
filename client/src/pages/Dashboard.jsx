@@ -119,6 +119,19 @@ export default function Dashboard() {
       alert("Agent silinirken hata oluştu");
     }
   };
+  const toggleAgent = async (agentId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api/agents/${agentId}/toggle`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAgents((prev) => prev.map((a) => (a._id === agentId ? res.data.agent : a)));
+    } catch (err) {
+      alert("Durum değiştirilirken hata oluştu");
+    }
+  };
 
   const getAgentReports = (agentId) => {
     return reports.filter((r) => (r.agent?._id || r.agent) === agentId);
@@ -230,9 +243,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 items-end">
-                      <span className={`px-3 py-1 rounded-full text-sm ${agent.isActive ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"}`}>
+                      <button
+                        onClick={() => toggleAgent(agent._id)}
+                        className={`px-3 py-1 rounded-full text-sm transition ${agent.isActive ? "bg-green-900 text-green-300 hover:bg-green-800" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}
+                      >
                         {agent.isActive ? "Aktif" : "Pasif"}
-                      </span>
+                      </button>
                       <button
                         onClick={() => runAgent(agent._id)}
                         disabled={!!liveStatus && liveStatus.status !== "done" && liveStatus.status !== "error" && liveStatus.status !== "failed"}
@@ -270,12 +286,20 @@ export default function Dashboard() {
                         ))}
                       </div>
                     )}
-                    <button
-                      onClick={() => navigate(`/agent/${agent._id}/sources`)}
-                      className="text-indigo-400 hover:text-indigo-300 text-sm transition"
-                    >
-                      + Kaynak Ekle
-                    </button>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => navigate(`/agent/${agent._id}/sources`)}
+                        className="text-indigo-400 hover:text-indigo-300 text-sm transition"
+                      >
+                        + Kaynak Ekle
+                      </button>
+                      <button
+                        onClick={() => navigate(`/agent/${agent._id}/reports`)}
+                        className="text-indigo-400 hover:text-indigo-300 text-sm transition"
+                      >
+                        📋 Tüm Raporları Gör
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
