@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [agents, setAgents] = useState([]);
   const [reports, setReports] = useState([]);
   const [agentStatuses, setAgentStatuses] = useState({}); // { agentId: { status, message } }
+  const [editingAgent, setEditingAgent] = useState(null); // düzenlenen agent'ın id'si
+  const [editForm, setEditForm] = useState({ name: "", description: "", topics: "", scheduledHour: 7 });
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
@@ -133,6 +135,40 @@ export default function Dashboard() {
     }
   };
 
+  const startEditing = (agent) => {
+    setEditingAgent(agent._id);
+    setEditForm({
+      name: agent.name,
+      description: agent.description || "",
+      topics: agent.topics.join(", "),
+      scheduledHour: agent.scheduledHour ?? 7,
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingAgent(null);
+  };
+
+  const saveEditing = async (agentId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/api/agents/${agentId}`,
+        {
+          name: editForm.name,
+          description: editForm.description,
+          topics: editForm.topics.split(",").map((t) => t.trim()).filter(Boolean),
+          scheduledHour: parseInt(editForm.scheduledHour, 10),
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAgents((prev) => prev.map((a) => (a._id === agentId ? res.data.agent : a)));
+      setEditingAgent(null);
+    } catch (err) {
+      alert("Agent güncellenirken hata oluştu");
+    }
+  };
+
   const getAgentReports = (agentId) => {
     return reports.filter((r) => (r.agent?._id || r.agent) === agentId);
   };
@@ -223,24 +259,90 @@ export default function Dashboard() {
               return (
                 <div key={agent._id} className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-6 border`}>
                   <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold">{agent.name}</h3>
-                      <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mt-1`}>{agent.description}</p>
-                      <div className="flex gap-2 mt-3 flex-wrap">
-                        {agent.topics.map((topic, i) => (
-                          <span key={i} className="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full text-sm">
-                            {topic}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex gap-4 mt-3 text-sm">
-                        <span className={isDark ? "text-gray-500" : "text-gray-400"}>
-                          📋 {agentReports.length} rapor
-                        </span>
-                        <span className={isDark ? "text-gray-500" : "text-gray-400"}>
-                          🕐 Son çalışma: {lastRun ? formatLastRun(lastRun.createdAt) : "Henüz çalışmadı"}
-                        </span>
-                      </div>
+<div className="flex-1">
+                      {editingAgent === agent._id ? (
+                        <div className="space-y-2 mb-2">
+                          <input
+                            type="text"
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                            className={`w-full ${isDark ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"} px-3 py-2 rounded-lg text-lg font-bold outline-none focus:ring-2 focus:ring-indigo-500`}
+                            placeholder="Agent adı"
+                          />
+                          <textarea
+                            value={editForm.description}
+                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                            className={`w-full ${isDark ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"} px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500`}
+                            placeholder="Açıklama"
+                            rows={2}
+                          />
+                          <input
+                            type="text"
+                            value={editForm.topics}
+                            onChange={(e) => setEditForm({ ...editForm, topics: e.target.value })}
+                            className={`w-full ${isDark ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"} px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500`}
+                            placeholder="Konular (virgülle ayır)"
+                          />
+                          <div className="flex items-center gap-2">
+                            <label className={`${isDark ? "text-gray-400" : "text-gray-600"} text-sm`}>Çalışma saati:</label>
+                            <select
+                              value={editForm.scheduledHour}
+                              onChange={(e) => setEditForm({ ...editForm, scheduledHour: e.target.value })}
+                              className={`${isDark ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"} px-2 py-1 rounded-lg text-sm outline-none`}
+                            >
+                              {Array.from({ length: 24 }, (_, i) => (
+                                <option key={i} value={i}>{i.toString().padStart(2, "0")}:00</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => saveEditing(agent._id)}
+                              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm transition"
+                            >
+                              Kaydet
+                            </button>
+                            <button
+                              onClick={cancelEditing}
+                              className={`${isDark ? "bg-gray-800 text-gray-300 hover:bg-gray-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"} px-4 py-1.5 rounded-lg text-sm transition`}
+                            >
+                              İptal
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-xl font-bold">{agent.name}</h3>
+                            <button
+                              onClick={() => startEditing(agent)}
+                              className={`${isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-700"} text-sm transition`}
+                              title="Düzenle"
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                          <p className={`${isDark ? "text-gray-400" : "text-gray-500"} mt-1`}>{agent.description}</p>
+                          <div className="flex gap-2 mt-3 flex-wrap">
+                            {agent.topics.map((topic, i) => (
+                              <span key={i} className="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full text-sm">
+                                {topic}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="flex gap-4 mt-3 text-sm flex-wrap">
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>
+                              📋 {agentReports.length} rapor
+                            </span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>
+                              🕐 Son çalışma: {lastRun ? formatLastRun(lastRun.createdAt) : "Henüz çalışmadı"}
+                            </span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>
+                              ⏰ Çalışma saati: {(agent.scheduledHour ?? 7).toString().padStart(2, "0")}:00
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 items-end">
                       <button

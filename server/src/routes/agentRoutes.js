@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive } = require('../controllers/agentController');
+const { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive, updateAgent } = require('../controllers/agentController');
 const { protect } = require('../middleware/authMiddleware');
 
 
@@ -11,6 +11,7 @@ router.post('/:id/sources', protect, addSource);
 router.delete('/:id/sources', protect, removeSource);
 router.delete('/:id', protect, deleteAgent);
 router.patch('/:id/toggle', protect, toggleActive);
+router.patch('/:id', protect, updateAgent);
 
 const { runAgent } = require('../services/agentRunner');
 

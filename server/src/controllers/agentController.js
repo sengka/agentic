@@ -129,5 +129,25 @@ const toggleActive = async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası', error: error.message });
   }
 };
+const updateAgent = async (req, res) => {
+  try {
+    const { name, description, topics, scheduledHour } = req.body;
+    const agent = await Agent.findOne({ _id: req.params.id, user: req.user.id });
 
-module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive };
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent bulunamadı' });
+    }
+
+    if (name !== undefined) agent.name = name;
+    if (description !== undefined) agent.description = description;
+    if (topics !== undefined) agent.topics = topics;
+    if (scheduledHour !== undefined) agent.scheduledHour = scheduledHour;
+
+    await agent.save();
+    res.json({ message: 'Agent güncellendi', agent });
+  } catch (error) {
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive, updateAgent };

@@ -23,6 +23,12 @@ const agentSchema = new mongoose.Schema({
     type: String,
     default: 'daily'
   },
+  scheduledHour: {
+    type: Number,
+    default: 7,
+    min: 0,
+    max: 23
+  },
   language: {
     type: String,
     default: 'tr'
@@ -32,5 +38,6 @@ const agentSchema = new mongoose.Schema({
     default: true
   }
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('Agent', agentSchema);
