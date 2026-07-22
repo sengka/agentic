@@ -23,10 +23,12 @@ const catchUpMissedRuns = async (io) => {
 };
 
 const startScheduler = (io) => {
-  catchUpMissedRuns(io);
+  if (process.env.ENABLE_CATCHUP !== 'false') {
+    catchUpMissedRuns(io);
+  } else {
+    console.log('Kaçırılan çalıştırma kontrolü devre dışı (geliştirme modu)');
+  }
 
-  // Her saat başı kontrol et: şu anki saat, hangi agent'ların tercih ettiği
-  // çalışma saatiyle eşleşiyor
   cron.schedule('0 * * * *', async () => {
     const currentHour = new Date().getHours();
     console.log(`Saatlik kontrol: ${currentHour}:00`);

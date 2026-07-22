@@ -1,4 +1,4 @@
-export default function ActivityHeatmap({ reports, isDark }) {
+export default function ActivityHeatmap({ reports, isDark, onDayClick }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -50,10 +50,17 @@ export default function ActivityHeatmap({ reports, isDark }) {
         {weeks.map((week, wi) => (
           <div key={wi} className="flex flex-col gap-1">
             {week.map((day, di) => (
-              <div
+<div
                 key={di}
+                onClick={() => day.count > 0 && onDayClick && onDayClick(day.date)}
                 title={`${day.date.toLocaleDateString('tr-TR')}: ${day.count} rapor`}
-                style={{ width: 12, height: 12, backgroundColor: getColor(day.count, day.isFuture), borderRadius: 2 }}
+                style={{
+                  width: 12,
+                  height: 12,
+                  backgroundColor: getColor(day.count, day.isFuture),
+                  borderRadius: 2,
+                  cursor: day.count > 0 ? 'pointer' : 'default',
+                }}
               />
             ))}
           </div>

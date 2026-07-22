@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [agentStatuses, setAgentStatuses] = useState({}); // { agentId: { status, message } }
   const [editingAgent, setEditingAgent] = useState(null); // düzenlenen agent'ın id'si
   const [editForm, setEditForm] = useState({ name: "", description: "", topics: "", scheduledHour: 7 });
+  const [selectedDate, setSelectedDate] = useState(null);
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
@@ -237,7 +238,44 @@ export default function Dashboard() {
           </div>
         )}
 
-{reports.length > 0 && <ActivityHeatmap reports={reports} isDark={isDark} />}
+{reports.length > 0 && (
+          <ActivityHeatmap reports={reports} isDark={isDark} onDayClick={(date) => setSelectedDate(date)} />
+        )}
+
+        {selectedDate && (
+          <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-5 border mb-8`}>
+            <div className="flex justify-between items-center mb-3">
+              <p className="font-semibold">
+                📅 {selectedDate.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })} tarihli raporlar
+              </p>
+              <button
+                onClick={() => setSelectedDate(null)}
+                className={isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-700"}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2">
+              {reports
+                .filter((r) => {
+                  const d = new Date(r.createdAt);
+                  return (
+                    d.getFullYear() === selectedDate.getFullYear() &&
+                    d.getMonth() === selectedDate.getMonth() &&
+                    d.getDate() === selectedDate.getDate()
+                  );
+                })
+                .map((r) => (
+                  <div key={r._id} className={`${isDark ? "bg-gray-800" : "bg-gray-50 border border-gray-200"} rounded-xl p-3`}>
+                    <p className="text-sm font-medium">{r.agent?.name || "Agent"}</p>
+                    <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-xs mt-1`}>
+                      {new Date(r.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
         <button
           onClick={() => navigate("/create-agent")}
           className="mb-8 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
