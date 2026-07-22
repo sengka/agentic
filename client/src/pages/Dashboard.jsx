@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { useTheme } from "../ThemeContext";
+import ActivityHeatmap from "../components/ActivityHeatmap";
 
 const statusLabels = {
   scraping: "🔍 Kaynaklar taranıyor...",
@@ -236,6 +237,7 @@ export default function Dashboard() {
           </div>
         )}
 
+{reports.length > 0 && <ActivityHeatmap reports={reports} isDark={isDark} />}
         <button
           onClick={() => navigate("/create-agent")}
           className="mb-8 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
