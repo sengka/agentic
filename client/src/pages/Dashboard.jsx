@@ -22,6 +22,8 @@ export default function Dashboard() {
   const [editingAgent, setEditingAgent] = useState(null); // düzenlenen agent'ın id'si
   const [editForm, setEditForm] = useState({ name: "", description: "", topics: "", scheduledHour: 7 });
   const [selectedDate, setSelectedDate] = useState(null);
+  const [weeklySummary, setWeeklySummary] = useState(null);
+  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const navigate = useNavigate();
   const { isDark, setIsDark } = useTheme();
 
@@ -170,6 +172,18 @@ export default function Dashboard() {
       alert("Agent güncellenirken hata oluştu");
     }
   };
+  const fetchWeeklySummary = async () => {
+    const token = localStorage.getItem("token");
+    setShowWeeklySummary(true);
+    try {
+      const res = await axios.get("http://localhost:5000/api/reports/weekly-summary", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setWeeklySummary(res.data);
+    } catch (err) {
+      console.error("Haftalık özet hatası:", err.message);
+    }
+  };
 
   const getAgentReports = (agentId) => {
     return reports.filter((r) => (r.agent?._id || r.agent) === agentId);
@@ -282,6 +296,38 @@ export default function Dashboard() {
         >
           + Yeni Agent Oluştur
         </button>
+        <button
+          onClick={fetchWeeklySummary}
+          className={`mb-8 ml-3 ${isDark ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-900"} px-6 py-3 rounded-xl font-semibold transition`}
+        >
+          📰 Haftalık Özeti Gör
+        </button>
+
+        {showWeeklySummary && (
+          <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-6 border mb-8`}>
+            <div className="flex justify-between items-center mb-3">
+              <p className="font-semibold text-indigo-400">📰 Haftalık Özet</p>
+              <button
+                onClick={() => setShowWeeklySummary(false)}
+                className={isDark ? "text-gray-500 hover:text-white" : "text-gray-400 hover:text-gray-700"}
+              >
+                ✕
+              </button>
+            </div>
+            {weeklySummary ? (
+              <>
+                <p className={`${isDark ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed mb-3`}>
+                  {weeklySummary.summary}
+                </p>
+                <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-xs`}>
+                  {weeklySummary.reportCount} rapor baz alındı · {new Date(weeklySummary.weekStart).toLocaleDateString("tr-TR")} - {new Date(weeklySummary.weekEnd).toLocaleDateString("tr-TR")}
+                </p>
+              </>
+            ) : (
+              <p className={isDark ? "text-gray-400" : "text-gray-500"}>Yükleniyor...</p>
+            )}
+          </div>
+        )}
 
         {agents.length === 0 ? (
           <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-8 text-center border`}>
