@@ -1,4 +1,5 @@
 const Report = require('../models/Report');
+const { generateWeeklySummary } = require('../services/weeklySummaryService');
 
 const { semanticSearch, generateAnswer } = require('../services/searchService');
 
@@ -63,5 +64,13 @@ const searchReports = async (req, res) => {
     res.status(500).json({ message: 'Arama sırasında hata oluştu', error: error.message });
   }
 };
+const getWeeklySummary = async (req, res) => {
+  try {
+    const result = await generateWeeklySummary(req.user.id);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: 'Haftalık özet oluşturulurken hata oluştu', error: error.message });
+  }
+};
 
-module.exports = { getReports, getReportsByAgent, updateFeedback, searchReports };
+module.exports = { getReports, getReportsByAgent, updateFeedback, searchReports, getWeeklySummary };
