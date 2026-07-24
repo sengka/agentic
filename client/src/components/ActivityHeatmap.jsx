@@ -1,4 +1,4 @@
-export default function ActivityHeatmap({ reports, isDark, onDayClick }) {
+export default function ActivityHeatmap({ reports, isDark, onDayClick, onWeeklySummaryClick }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -45,7 +45,17 @@ export default function ActivityHeatmap({ reports, isDark, onDayClick }) {
 
   return (
     <div className={`${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl p-5 border mb-8 overflow-x-auto`}>
-      <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm mb-3 font-semibold`}>📅 Aktivite Takvimi</p>
+<div className="flex justify-between items-center mb-3">
+        <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm font-semibold`}>📅 Aktivite Takvimi</p>
+        {onWeeklySummaryClick && (
+          <button
+            onClick={onWeeklySummaryClick}
+            className={`${isDark ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-700"} text-xs font-medium transition`}
+          >
+            📰 Haftalık Özeti Gör
+          </button>
+        )}
+      </div>
       <div className="inline-flex gap-1">
         {weeks.map((week, wi) => (
           <div key={wi} className="flex flex-col gap-1">

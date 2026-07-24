@@ -253,7 +253,12 @@ export default function Dashboard() {
         )}
 
 {reports.length > 0 && (
-          <ActivityHeatmap reports={reports} isDark={isDark} onDayClick={(date) => setSelectedDate(date)} />
+          <ActivityHeatmap
+            reports={reports}
+            isDark={isDark}
+            onDayClick={(date) => setSelectedDate(date)}
+            onWeeklySummaryClick={fetchWeeklySummary}
+          />
         )}
 
         {selectedDate && (
@@ -314,14 +319,25 @@ export default function Dashboard() {
                 ✕
               </button>
             </div>
-            {weeklySummary ? (
+{weeklySummary ? (
               <>
                 <p className={`${isDark ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed mb-3`}>
                   {weeklySummary.summary}
                 </p>
-                <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-xs`}>
-                  {weeklySummary.reportCount} rapor baz alındı · {new Date(weeklySummary.weekStart).toLocaleDateString("tr-TR")} - {new Date(weeklySummary.weekEnd).toLocaleDateString("tr-TR")}
-                </p>
+                <div className="flex justify-between items-center">
+                  <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-xs`}>
+                    {weeklySummary.reportCount} rapor baz alındı · {new Date(weeklySummary.weekStart).toLocaleDateString("tr-TR")} - {new Date(weeklySummary.weekEnd).toLocaleDateString("tr-TR")}
+                  </p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(weeklySummary.summary);
+                      alert("Özet panoya kopyalandı!");
+                    }}
+                    className={`${isDark ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-700"} text-xs font-medium transition`}
+                  >
+                    📋 Kopyala
+                  </button>
+                </div>
               </>
             ) : (
               <p className={isDark ? "text-gray-400" : "text-gray-500"}>Yükleniyor...</p>

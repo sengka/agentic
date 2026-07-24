@@ -31,4 +31,27 @@ const sendReportEmail = async (toEmail, agentName, dailySummary) => {
   }
 };
 
-module.exports = { sendReportEmail };
+const sendWeeklySummaryEmail = async (toEmail, summary, reportCount) => {
+  try {
+    await transporter.sendMail({
+      from: `"Agentic" <${process.env.EMAIL_USER}>`,
+      to: toEmail,
+      subject: `📰 Haftalık Özetin Hazır`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2 style="color: #6366f1;">📰 Bu Haftanın Özeti</h2>
+          <p style="color: #666;">${reportCount} rapor baz alınarak hazırlandı:</p>
+          <div style="background: #f9fafb; padding: 16px; border-radius: 12px; margin-top: 12px;">
+            <p style="white-space: pre-line; color: #333;">${summary}</p>
+          </div>
+          <p style="color: #999; font-size: 12px; margin-top: 20px;">Bu email Agentic platformu tarafından otomatik gönderilmiştir.</p>
+        </div>
+      `,
+    });
+    console.log(`Haftalık özet email'i gönderildi: ${toEmail}`);
+  } catch (error) {
+    console.error('Haftalık özet email hatası:', error.message);
+  }
+};
+
+module.exports = { sendReportEmail, sendWeeklySummaryEmail };
