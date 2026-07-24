@@ -53,6 +53,24 @@ export default function Reports() {
       console.error("Feedback hatası:", err.message);
     }
   };
+  const downloadPDF = async (reportId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`http://localhost:5000/api/reports/${reportId}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `rapor-${reportId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      alert("PDF indirilirken hata oluştu");
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -164,6 +182,14 @@ export default function Reports() {
                         : "bg-gray-100 text-gray-600 hover:text-gray-900"
                     }`}
                   >
+                    <button
+                    onClick={() => downloadPDF(report._id)}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                      isDark ? "bg-gray-800 text-gray-400 hover:text-white" : "bg-gray-100 text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    📄 PDF İndir
+                  </button>
                     👍 Beğendim
                   </button>
                   <button
