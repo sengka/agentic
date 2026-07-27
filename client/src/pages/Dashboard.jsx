@@ -4,6 +4,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { useTheme } from "../ThemeContext";
 import ActivityHeatmap from "../components/ActivityHeatmap";
+import AgentComparison from "../components/AgentComparison";
 
 const statusLabels = {
   scraping: "🔍 Kaynaklar taranıyor...",
@@ -252,6 +253,7 @@ export default function Dashboard() {
           </div>
         )}
 
+<AgentComparison agents={agents} reports={reports} isDark={isDark} />
 {reports.length > 0 && (
           <ActivityHeatmap
             reports={reports}
