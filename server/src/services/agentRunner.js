@@ -8,6 +8,27 @@ const { sendReportEmail } = require('./emailService');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Başlıkları normalize edip kelime bazlı benzerlik hesaplar (Jaccard benzerliği)
+const normalizeTitle = (title) => title.toLowerCase().replace(/[^\wğüşıöç\s]/gi, '').trim();
+
+const titleSimilarity = (a, b) => {
+  const wordsA = new Set(normalizeTitle(a).split(/\s+/).filter(w => w.length > 2));
+  const wordsB = new Set(normalizeTitle(b).split(/\s+/).filter(w => w.length > 2));
+  if (wordsA.size === 0 || wordsB.size === 0) return 0;
+  const intersection = [...wordsA].filter(w => wordsB.has(w)).length;
+  const union = new Set([...wordsA, ...wordsB]).size;
+  return intersection / union;
+};
+
+// Benzer başlıklı haberleri (farklı kaynaklardan gelen aynı haber) eler, ilkini tutar
+const deduplicateItems = (items) => {
+  const unique = [];
+  for (const item of items) {
+    const isDuplicate = unique.some((u) => titleSimilarity(u.title, item.title) > 0.6);
+    if (!isDuplicate) unique.push(item);
+  }
+  return unique;
+};
 // Geçmiş feedback'lere göre her kaynağın puanını hesapla
 const getSourceScores = async (agentId) => {
   const pastReports = await Report.find({ agent: agentId, feedback: { $ne: null } });
@@ -39,7 +60,10 @@ const runAgent = async (agentId, io) => {
         return items;
       })
     );
-    const allItems = results.flat();
+
+    const rawItems = results.flat();
+    const allItems = deduplicateItems(rawItems);
+    console.log(`Tekilleştirme: ${rawItems.length} haberden ${allItems.length} tanesi kaldı (${rawItems.length - allItems.length} tekrar elendi)`);
 
     if (allItems.length === 0) {
       console.log('Hiç içerik bulunamadı');
