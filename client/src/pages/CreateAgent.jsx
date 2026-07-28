@@ -13,7 +13,7 @@ export default function CreateAgent() {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:5000/api/agents",
+        "https://agentic-468i.onrender.com/api/agents",
         { userInput },
         { headers: { Authorization: `Bearer ${token}` } }
       );

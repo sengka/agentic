@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   const fetchAgents = (token) => {
     axios
-      .get("http://localhost:5000/api/agents", {
+      .get("https://agentic-468i.onrender.com/api/agents", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setAgents(res.data));
@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   const fetchReports = (token) => {
     axios
-      .get("http://localhost:5000/api/reports", {
+      .get("https://agentic-468i.onrender.com/api/reports", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setReports(res.data));
@@ -52,7 +52,7 @@ export default function Dashboard() {
     }
 
     axios
-      .get("http://localhost:5000/api/auth/me", {
+      .get("https://agentic-468i.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data.user))
@@ -64,7 +64,7 @@ export default function Dashboard() {
     fetchAgents(token);
     fetchReports(token);
 
-    const socket = io("http://localhost:5000");
+    const socket = io("https://agentic-468i.onrender.com");
 
     socket.on("agentStatus", (data) => {
       setAgentStatuses((prev) => ({ ...prev, [data.agentId]: data }));
@@ -103,7 +103,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        `http://localhost:5000/api/agents/${agentId}/run`,
+        `https://agentic-468i.onrender.com/api/agents/${agentId}/run`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -118,7 +118,7 @@ export default function Dashboard() {
     }
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:5000/api/agents/${agentId}`, {
+      await axios.delete(`https://agentic-468i.onrender.com/api/agents/${agentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAgents((prev) => prev.filter((a) => a._id !== agentId));
@@ -130,7 +130,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/agents/${agentId}/toggle`,
+        `https://agentic-468i.onrender.com/api/agents/${agentId}/toggle`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -158,7 +158,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/agents/${agentId}`,
+        `https://agentic-468i.onrender.com/api/agents/${agentId}`,
         {
           name: editForm.name,
           description: editForm.description,
@@ -177,7 +177,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     setShowWeeklySummary(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/reports/weekly-summary", {
+      const res = await axios.get("https://agentic-468i.onrender.com/api/reports/weekly-summary", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWeeklySummary(res.data);

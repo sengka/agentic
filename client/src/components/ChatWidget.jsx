@@ -28,7 +28,7 @@ export default function ChatWidget() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/reports/search",
+        "https://agentic-468i.onrender.com/api/reports/search",
         { query: userMessage.text },
         { headers: { Authorization: `Bearer ${token}` } }
       );

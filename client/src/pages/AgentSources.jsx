@@ -13,7 +13,7 @@ export default function AgentSources() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:5000/api/agents", {
+      .get("https://agentic-468i.onrender.com/api/agents", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -27,7 +27,7 @@ export default function AgentSources() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/agents/${id}/sources`,
+        `https://agentic-468i.onrender.com/api/agents/${id}/sources`,
         { source: newSource },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -46,7 +46,7 @@ export default function AgentSources() {
     setTestResult(null);
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/agents/test-source`,
+        `https://agentic-468i.onrender.com/api/agents/test-source`,
         { source: newSource },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -62,7 +62,7 @@ export default function AgentSources() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/agents/${id}/sources`,
+        `https://agentic-468i.onrender.com/api/agents/${id}/sources`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { source }

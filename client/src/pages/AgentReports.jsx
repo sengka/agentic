@@ -24,7 +24,7 @@ export default function AgentReports() {
     }
 
     axios
-      .get(`http://localhost:5000/api/reports/agent/${id}`, {
+      .get(`https://agentic-468i.onrender.com/api/reports/agent/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -34,7 +34,7 @@ export default function AgentReports() {
       .catch(() => setLoading(false));
 
     axios
-      .get("http://localhost:5000/api/agents", {
+      .get("https://agentic-468i.onrender.com/api/agents", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

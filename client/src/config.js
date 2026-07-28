@@ -1,0 +1,1 @@
+export const API_URL = "https://agentic-468i.onrender.com";

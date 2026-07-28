@@ -28,7 +28,7 @@ export default function Reports() {
   const fetchReports = () => {
     const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:5000/api/reports", {
+      .get("https://agentic-468i.onrender.com/api/reports", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -42,7 +42,7 @@ export default function Reports() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.patch(
-        `http://localhost:5000/api/reports/${reportId}/feedback`,
+        `https://agentic-468i.onrender.com/api/reports/${reportId}/feedback`,
         { feedback },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -56,7 +56,7 @@ export default function Reports() {
   const downloadPDF = async (reportId) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(`http://localhost:5000/api/reports/${reportId}/pdf`, {
+      const res = await axios.get(`https://agentic-468i.onrender.com/api/reports/${reportId}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
@@ -81,7 +81,7 @@ export default function Reports() {
 
     fetchReports();
 
-    const socket = io("http://localhost:5000");
+    const socket = io("https://agentic-468i.onrender.com");
 
     socket.on("connect", () => {
       console.log("Socket bağlandı:", socket.id);
