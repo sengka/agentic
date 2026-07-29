@@ -1,6 +1,9 @@
+const path = require('path');
 const Report = require('../models/Report');
 const { generateWeeklySummary } = require('../services/weeklySummaryService');
 const PDFDocument = require('pdfkit');
+
+const FONT_PATH = path.join(__dirname, '..', 'assets', 'fonts', 'NotoSans-Variable.ttf');
 
 const { semanticSearch, generateAnswer } = require('../services/searchService');
 
@@ -82,7 +85,7 @@ const exportReportPDF = async (req, res) => {
     }
 
     const doc = new PDFDocument({ margin: 50 });
-    doc.font('C:\\Windows\\Fonts\\arial.ttf');
+    doc.font(FONT_PATH);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="rapor-${report._id}.pdf"`);

@@ -21,7 +21,6 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.3",
     "node-cron": "^4.6.0",
-    "nodemailer": "^9.0.3",
     "pdfkit": "^0.19.1",
     "puppeteer-core": "^25.3.0",
     "rss-parser": "^3.13.0",
