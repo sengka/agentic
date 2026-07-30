@@ -21,6 +21,8 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [agentStatuses, setAgentStatuses] = useState({}); // { agentId: { status, message } }
   const [editingAgent, setEditingAgent] = useState(null); // düzenlenen agent'ın id'si
+  const [editError, setEditError] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", description: "", topics: "", scheduledHour: 7 });
   const [selectedDate, setSelectedDate] = useState(null);
   const [weeklySummary, setWeeklySummary] = useState(null);
@@ -150,11 +152,18 @@ export default function Dashboard() {
     });
   };
 
-  const cancelEditing = () => {
+const cancelEditing = () => {
     setEditingAgent(null);
+    setEditError("");
   };
 
   const saveEditing = async (agentId) => {
+    if (!editForm.name.trim()) {
+      setEditError("Agent adı boş olamaz.");
+      return;
+    }
+    setEditError("");
+    setEditSaving(true);
     const token = localStorage.getItem("token");
     try {
       const res = await axios.patch(
@@ -170,7 +179,9 @@ export default function Dashboard() {
       setAgents((prev) => prev.map((a) => (a._id === agentId ? res.data.agent : a)));
       setEditingAgent(null);
     } catch (err) {
-      alert("Agent güncellenirken hata oluştu");
+      setEditError(err.response?.data?.message || "Agent güncellenirken bir hata oluştu.");
+    } finally {
+      setEditSaving(false);
     }
   };
   const fetchWeeklySummary = async () => {
@@ -399,16 +410,21 @@ export default function Dashboard() {
                               ))}
                             </select>
                           </div>
+{editError && (
+                            <p className="text-red-400 text-sm">⚠️ {editError}</p>
+                          )}
                           <div className="flex gap-2">
                             <button
                               onClick={() => saveEditing(agent._id)}
-                              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm transition"
+                              disabled={editSaving}
+                              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-sm transition disabled:opacity-50"
                             >
-                              Kaydet
+                              {editSaving ? "Kaydediliyor..." : "Kaydet"}
                             </button>
                             <button
                               onClick={cancelEditing}
-                              className={`${isDark ? "bg-gray-800 text-gray-300 hover:bg-gray-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"} px-4 py-1.5 rounded-lg text-sm transition`}
+                              disabled={editSaving}
+                              className={`${isDark ? "bg-gray-800 text-gray-300 hover:bg-gray-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"} px-4 py-1.5 rounded-lg text-sm transition disabled:opacity-50`}
                             >
                               İptal
                             </button>
