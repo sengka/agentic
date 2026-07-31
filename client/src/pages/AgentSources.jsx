@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function AgentSources() {
   const { id } = useParams();
@@ -8,6 +9,10 @@ export default function AgentSources() {
   const [newSource, setNewSource] = useState("");
   const [testResult, setTestResult] = useState(null);
   const [testing, setTesting] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [removeTarget, setRemoveTarget] = useState(null);
+  const [removing, setRemoving] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +29,8 @@ export default function AgentSources() {
 
   const handleAddSource = async () => {
     if (!newSource.trim()) return;
+    setAdding(true);
+    setAddError("");
     const token = localStorage.getItem("token");
     try {
       const res = await axios.post(
@@ -35,7 +42,9 @@ export default function AgentSources() {
       setNewSource("");
       setTestResult(null);
     } catch (err) {
-      console.error(err);
+      setAddError(err.response?.data?.message || "Kaynak eklenirken bir hata oluştu.");
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -58,19 +67,28 @@ export default function AgentSources() {
     }
   };
 
-  const handleRemoveSource = async (source) => {
+  const handleRemoveSource = (source) => {
+    setRemoveTarget(source);
+  };
+
+  const confirmRemoveSource = async () => {
+    if (!removeTarget) return;
+    setRemoving(true);
     const token = localStorage.getItem("token");
     try {
       const res = await axios.delete(
         `https://agentic-468i.onrender.com/api/agents/${id}/sources`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          data: { source }
+          data: { source: removeTarget },
         }
       );
       setAgent(res.data.agent);
+      setRemoveTarget(null);
     } catch (err) {
-      console.error(err);
+      setAddError("Kaynak silinirken bir hata oluştu.");
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -79,9 +97,9 @@ export default function AgentSources() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <nav className="bg-gray-900 px-8 py-4 flex justify-between items-center">
-<button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
-  Agentic
-</button>
+        <button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
+          Agentic
+        </button>
         <button onClick={() => navigate("/dashboard")} className="text-gray-400 hover:text-white">
           Geri
         </button>
@@ -100,6 +118,7 @@ export default function AgentSources() {
               onChange={(e) => {
                 setNewSource(e.target.value);
                 setTestResult(null);
+                setAddError("");
               }}
               className="flex-1 bg-gray-800 text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -112,11 +131,16 @@ export default function AgentSources() {
             </button>
             <button
               onClick={handleAddSource}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+              disabled={adding || !newSource.trim()}
+              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-semibold transition"
             >
-              Ekle
+              {adding ? "Ekleniyor..." : "Ekle"}
             </button>
           </div>
+
+          {addError && (
+            <p className="text-red-400 text-sm mt-3">⚠️ {addError}</p>
+          )}
 
           {testResult && (
             <div className={`mt-4 rounded-xl p-4 text-sm ${testResult.success ? "bg-green-950 border border-green-800 text-green-300" : "bg-red-950 border border-red-800 text-red-300"}`}>
@@ -150,6 +174,17 @@ export default function AgentSources() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={!!removeTarget}
+        title="Kaynağı sil"
+        message={`"${removeTarget}" kaynağını kaldırmak istediğine emin misin?`}
+        confirmLabel="Sil"
+        loading={removing}
+        isDark={true}
+        onConfirm={confirmRemoveSource}
+        onCancel={() => setRemoveTarget(null)}
+      />
     </div>
   );
 }

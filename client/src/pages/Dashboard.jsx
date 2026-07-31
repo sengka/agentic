@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
-import { useTheme } from "../ThemeContext";
+import { useTheme } from "../ThemeContext"
 import ActivityHeatmap from "../components/ActivityHeatmap";
 import AgentComparison from "../components/AgentComparison";
+import ConfirmModal from "../components/ConfirmModal";
 
 const statusLabels = {
   scraping: "🔍 Kaynaklar taranıyor...",
@@ -23,6 +24,8 @@ export default function Dashboard() {
   const [editingAgent, setEditingAgent] = useState(null); // düzenlenen agent'ın id'si
   const [editError, setEditError] = useState("");
   const [editSaving, setEditSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, name }
+  const [deleting, setDeleting] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", description: "", topics: "", scheduledHour: 7 });
   const [selectedDate, setSelectedDate] = useState(null);
   const [weeklySummary, setWeeklySummary] = useState(null);
@@ -114,18 +117,24 @@ export default function Dashboard() {
     }
   };
 
-  const deleteAgent = async (agentId, agentName) => {
-    if (!window.confirm(`"${agentName}" adlı agent'ı silmek istediğine emin misin? Bu işlem geri alınamaz.`)) {
-      return;
-    }
+const deleteAgent = (agentId, agentName) => {
+    setDeleteTarget({ id: agentId, name: agentName });
+  };
+
+  const confirmDeleteAgent = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`https://agentic-468i.onrender.com/api/agents/${agentId}`, {
+      await axios.delete(`https://agentic-468i.onrender.com/api/agents/${deleteTarget.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAgents((prev) => prev.filter((a) => a._id !== agentId));
+      setAgents((prev) => prev.filter((a) => a._id !== deleteTarget.id));
+      setDeleteTarget(null);
     } catch (err) {
       alert("Agent silinirken hata oluştu");
+    } finally {
+      setDeleting(false);
     }
   };
   const toggleAgent = async (agentId) => {
@@ -529,6 +538,17 @@ const cancelEditing = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Agent'ı sil"
+        message={`"${deleteTarget?.name}" adlı agent'ı silmek istediğine emin misin? Bu işlem geri alınamaz.`}
+        confirmLabel="Sil"
+        loading={deleting}
+        isDark={isDark}
+        onConfirm={confirmDeleteAgent}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
