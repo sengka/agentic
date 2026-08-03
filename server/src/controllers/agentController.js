@@ -41,8 +41,24 @@ const getAgents = async (req, res) => {
 const addSource = async (req, res) => {
   try {
     const { source } = req.body;
+
+    if (!source || typeof source !== 'string' || !source.trim()) {
+      return res.status(400).json({ message: 'Geçerli bir kaynak URL\'si girin' });
+    }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(source.trim());
+    } catch {
+      return res.status(400).json({ message: 'Geçersiz URL formatı. Örnek: https://techcrunch.com' });
+    }
+
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      return res.status(400).json({ message: 'URL http:// veya https:// ile başlamalı' });
+    }
+
     const agent = await Agent.findOne({ _id: req.params.id, user: req.user.id });
-    
+
     if (!agent) {
       return res.status(404).json({ message: 'Agent bulunamadı' });
     }
