@@ -197,7 +197,7 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView className="flex-1 bg-slate-950">
       {/* Header */}
-      <View className="flex-row justify-between items-center px-6 pt-6 pb-4 border-b border-slate-900 bg-slate-950/80">
+      <View className="flex-row justify-between items-center px-6 pt-6 pb-4 border-b border-slate-900 bg-slate-950">
         <View>
           <Text className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Hoş geldin</Text>
           <Text className="text-white text-xl font-bold">{user?.name} 👋</Text>
@@ -213,15 +213,15 @@ export default function DashboardScreen() {
       <ScrollView className="flex-1 px-6 pt-4" showsVerticalScrollIndicator={false}>
         {/* Statistics Cards */}
         <View className="flex-row justify-between mb-6">
-          <View className="flex-1 bg-slate-900/50 p-4 rounded-2xl border border-slate-900 mr-2 items-center">
+          <View className="flex-1 bg-slate-900 p-4 rounded-2xl border border-slate-900 mr-2 items-center">
             <Text className="text-indigo-400 text-2xl font-black">{agents.length}</Text>
             <Text className="text-gray-400 text-[10px] uppercase font-semibold mt-1">Toplam Ajan</Text>
           </View>
-          <View className="flex-1 bg-slate-900/50 p-4 rounded-2xl border border-slate-900 mx-1 items-center">
+          <View className="flex-1 bg-slate-900 p-4 rounded-2xl border border-slate-900 mx-1 items-center">
             <Text className="text-emerald-400 text-2xl font-black">{activeAgentsCount}</Text>
             <Text className="text-gray-400 text-[10px] uppercase font-semibold mt-1">Aktif Ajan</Text>
           </View>
-          <View className="flex-1 bg-slate-900/50 p-4 rounded-2xl border border-slate-900 ml-2 items-center">
+          <View className="flex-1 bg-slate-900 p-4 rounded-2xl border border-slate-900 ml-2 items-center">
             <Text className="text-violet-400 text-2xl font-black">{reports.length}</Text>
             <Text className="text-gray-400 text-[10px] uppercase font-semibold mt-1">Rapor Arşivi</Text>
           </View>
@@ -241,7 +241,7 @@ export default function DashboardScreen() {
 
         {/* Agent Cards List */}
         {agents.length === 0 ? (
-          <View className="bg-slate-900/30 border border-dashed border-slate-900 rounded-3xl p-8 items-center justify-center my-4">
+          <View className="bg-slate-900 border border-dashed border-slate-900 rounded-3xl p-8 items-center justify-center my-4">
             <Text className="text-gray-500 text-sm text-center">Henüz bir takip ajanı oluşturmadınız.</Text>
             <Text className="text-indigo-400/80 text-xs mt-2 font-medium">Web arayüzünden yeni ajanlar ekleyebilirsiniz.</Text>
           </View>
@@ -256,8 +256,8 @@ export default function DashboardScreen() {
               <View
                 key={agent._id}
                 style={{ opacity: agent.isActive ? 1 : 0.6 }}
-                className={`bg-slate-900/60 border ${
-                  isRunning ? "border-indigo-500/50 shadow-lg shadow-indigo-500/20" : "border-slate-900"
+                className={`bg-slate-900 border ${
+                  isRunning ? "border-indigo-500 shadow-md" : "border-slate-900"
                 } rounded-3xl p-5 mb-4 overflow-hidden`}
               >
                 {/* Agent Header info */}
@@ -284,7 +284,7 @@ export default function DashboardScreen() {
                 {/* Badge Topics */}
                 <View className="flex-row flex-wrap gap-1.5 mb-4">
                   {agent.topics.map((topic, i) => (
-                    <View key={i} className="bg-indigo-950/80 border border-indigo-900/50 px-2.5 py-1 rounded-full">
+                    <View key={i} className="bg-indigo-950 border border-indigo-900 px-2.5 py-1 rounded-full">
                       <Text className="text-indigo-300 text-[10px] font-semibold">{topic}</Text>
                     </View>
                   ))}
@@ -321,7 +321,7 @@ export default function DashboardScreen() {
 
                 {/* Live Socket Status Details */}
                 {liveStatus ? (
-                  <View className="mt-4 bg-indigo-950/40 border border-indigo-900/30 rounded-2xl p-3">
+                  <View className="mt-4 bg-indigo-950 border border-indigo-900 rounded-2xl p-3">
                     <Text className="text-indigo-300 text-xs font-bold">
                       {statusLabels[liveStatus.status] || "Ajan İşlemi"}
                     </Text>
