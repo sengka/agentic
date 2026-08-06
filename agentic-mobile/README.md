@@ -1,56 +1,103 @@
-# Welcome to your Expo app 👋
+# Agentic Mobile 📱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Kişisel AI Ekosistem Platformu Mobil Uygulaması** — Kullanıcıların otonom çalışan yapay zeka ajanlarını (AI Agents) yönettikleri, canlı Socket.io durum güncellemelerini takip ettikleri, yapay zekanın ürettiği raporları okuyup paylaştıkları ve RAG tabanlı arama yaptıkları hibrit React Native (Expo) uygulamasıdır.
 
-## Get started
+Bu mobil uygulama, web arayüzüyle tam senkronize şekilde çalışarak kullanıcılara eksiksiz bir mobil SaaS deneyimi sunar.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## ✨ Özellikler
 
-2. Start the app
+### 🤖 1. Ajanlar (Dashboard)
+- **Canlı Socket Takibi:** Ajanların çalışma süreçleri (kaynak tarama, embedding oluşturma, özetleme adımları) Socket.io üzerinden canlı olarak izlenir.
+- **Ajan Yönetimi:** Tek dokunuşla ajanları aktif/pasif yapma, anlık çalıştırma (▶ Çalıştır), düzenleme (ad, açıklama, konular, saat) ve güvenli silme (🗑️ Sil) işlemleri yapılabilir.
+- **Pull-To-Refresh:** Sayfayı aşağı çekerek anlık verileri yenileme refleks desteği.
 
-   ```bash
-   npx expo start
-   ```
+### ➕ 2. Yeni Ajan Ekleme (Create Agent)
+- **Doğal Dil Girişi:** Ajanın ne yapması gerektiği düz metin olarak yazılır (Örn: *"Döviz hareketlerini izle"*).
+- **AI Geliştir (Sihirli Değnek):** Tek tıkla yazılan basit fikir, Gemini API kullanılarak detaylı bir ajan komutuna (prompt) zenginleştirilir.
+- **Hazır Şablonlar:** Sık kullanılan ajan fikirleri için hızlı başlangıç şablon kartları.
 
-In the output, you'll find options to open the app in a
+### 📋 3. Rapor Arşivi (Reports)
+- **Akordeon Tasarım:** Günlük rapor özetleri, tıklandığında genişleyen şık kartlar halinde listelenir.
+- **Kaynak Haberler:** Raporun referans aldığı web sitelerinin listesi, tıklandığında telefonun varsayılan tarayıcısında açılacak bağlantılarla gösterilir.
+- **Geri Bildirim (Feedback):** Raporlara Beğendim (👍) ve Beğenmedim (👎) oyları verilerek yapay zekanın kaynak seçimi iyileştirilir.
+- **📤 Paylaş (Native Share):** Rapor özet metni tek tıkla telefonun yerel paylaşım menüsü üzerinden (WhatsApp, Mail vb.) gönderilebilir.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 🔍 4. Arama & AI Asistanı (RAG Search)
+- **Semantik Arama:** Geçmiş raporlar içinde doğal dille anlam bazlı akıllı arama yapılır.
+- **Asistan Cevabı:** Yapay zeka, arama sonuçlarını sentezleyerek üstte şık mor bir kartta doğrudan sorunuza yanıt verir (hallucination içermez). Altta ise kaynak haberlerin eşleşme yüzdeleri (% Eşleşme) gösterilir.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 👤 5. Profil & İstatistik (Profile)
+- Kullanıcının hesap bilgileri, toplam ajan sayısı, aktif çalışan ajan sayısı ve beğenilen rapor istatistikleri görsel kartlarla sunulur.
+- Güvenli çıkış yapma (Logout) kontrolü barındırır.
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 🛠️ Teknolojiler
 
+- **Framework:** Expo SDK (React Native)
+- **Yönlendirme:** Expo Router (Dosya tabanlı navigasyon)
+- **Tasarım:** NativeWind (TailwindCSS v3 — Sleek Dark Mode)
+- **Ağ İletişimi:** Axios, Socket.io-client
+- **Konumlandırma:** React Native Safe Area Context
+
+---
+
+## 📁 Proje Klasör Yapısı
+
+agentic-mobile/
+├── src/
+│ ├── app/ # Sayfalar (Expo Router)
+│ │ ├── _layout.tsx # Kök yapılandırma ve Auth sağlayıcı
+│ │ ├── login.tsx # Giriş Yap sayfası
+│ │ ├── register.tsx # Kayıt Ol sayfası
+│ │ ├── dashboard.tsx # Ajan listesi ve kontrol paneli
+│ │ ├── create-agent.tsx # Yeni ajan ekleme ekranı
+│ │ ├── reports.tsx # Rapor arşivi
+│ │ ├── search.tsx # RAG Arama ve AI Asistanı
+│ │ └── profile.tsx # Profil ve istatistik sayfası
+│ ├── components/
+│ │ └── BottomNav.tsx # 5 Sekmeli şık alt menü bileşeni
+│ ├── context/
+│ │ └── AuthContext.tsx # JWT token ve oturum yönetimi
+│ ├── config.ts # Sunucu URL ayarları
+│ └── global.css # Küresel TailwindCSS stilleri
+
+
+---
+
+## 🚀 Kurulum ve Çalıştırma
+
+### 1. Bağımlılıkları Yükleme
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Yapılandırma
+`src/config.ts` dosyasında `API_URL` adresinin backend sunucunuzu gösterdiğinden emin olun:
+```ts
+export const API_URL = "https://agentic-468i.onrender.com";
+```
 
-### Other setup steps
+### 3. Geliştirici Modunda Başlatma
+Android emülatörünüz veya fiziksel cihazınız bağlıyken:
+```bash
+npm run android
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 4. Yerel APK Derleme (Build APK)
+Fiziksel cihazlara kurulabilecek debug `.apk` paketi üretmek için (JDK 17 kurulu olmalı):
+```bash
+cd android
+.\gradlew.bat clean
+.\gradlew.bat assembleDebug
+```
+Derleme bittiğinde APK dosyanız şu dizinde hazır olacaktır:
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 👩‍💻 Geliştirici
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Sena Gül Kara** — Samsun Üniversitesi, Yazılım Mühendisliği
