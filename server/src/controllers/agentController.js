@@ -1,5 +1,5 @@
 const Agent = require('../models/Agent');
-const { parseAgentFromText } = require('../services/geminiService');
+const { parseAgentFromText, enhancePromptText } = require('../services/geminiService');
 const { scrapeSource } = require('../services/scraperService');
 
 const createAgent = async (req, res) => {
@@ -166,4 +166,17 @@ const updateAgent = async (req, res) => {
   }
 };
 
-module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive, updateAgent };
+const enhancePrompt = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt || !prompt.trim()) {
+      return res.status(400).json({ message: 'Açıklama alanı boş olamaz.' });
+    }
+    const enhancedPrompt = await enhancePromptText(prompt);
+    res.json({ enhancedPrompt });
+  } catch (error) {
+    res.status(500).json({ message: 'AI geliştirme hatası', error: error.message });
+  }
+};
+
+module.exports = { createAgent, getAgents, addSource, removeSource, testSource, deleteAgent, toggleActive, updateAgent, enhancePrompt };

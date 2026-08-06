@@ -18,7 +18,30 @@ export default function CreateAgentScreen() {
   const { token } = useAuth();
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
   const [error, setError] = useState("");
+
+  const handleEnhancePrompt = async () => {
+    if (!userInput.trim()) {
+      setError("Önce geliştirmek istediğiniz kısa bir fikir yazın.");
+      return;
+    }
+    setError("");
+    setEnhancing(true);
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/agents/enhance-prompt`,
+        { prompt: userInput },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserInput(res.data.enhancedPrompt);
+    } catch (err: any) {
+      console.error("AI prompt geliştirme hatası:", err);
+      setError("AI zenginleştirme sırasında bir hata oluştu.");
+    } finally {
+      setEnhancing(false);
+    }
+  };
 
   const handleCreate = async () => {
     if (!userInput.trim()) {
@@ -86,8 +109,21 @@ export default function CreateAgentScreen() {
             ) : null}
 
             <TouchableOpacity
+              onPress={handleEnhancePrompt}
+              disabled={enhancing || loading || !userInput.trim()}
+              className="mt-3 w-full bg-slate-950 border border-slate-800 active:bg-slate-900 py-3 rounded-2xl items-center flex-row justify-center"
+            >
+              {enhancing ? (
+                <ActivityIndicator size="small" color="#6366f1" className="mr-2" />
+              ) : null}
+              <Text className="text-indigo-400 font-bold text-xs">
+                {enhancing ? "AI Zenginleştiriyor..." : "✨ AI Geliştir (Gelişmiş Prompt)"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               onPress={handleCreate}
-              disabled={loading}
+              disabled={loading || enhancing}
               className="mt-4 w-full bg-indigo-600 active:bg-indigo-700 disabled:opacity-50 py-3 rounded-2xl items-center flex-row justify-center"
             >
               {loading ? (

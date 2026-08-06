@@ -27,4 +27,18 @@ Sadece JSON döndür, başka hiçbir şey yazma.
   return JSON.parse(clean);
 };
 
-module.exports = { parseAgentFromText };
+const enhancePromptText = async (userInput) => {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const prompt = `
+Kullanıcı bir AI agent oluşturmak istiyor ve başlangıç olarak şu açıklamayı yazdı:
+"${userInput}"
+
+Bu açıklamayı analiz et ve onu daha kapsamlı, profesyonel, detaylı ve ne yapacağını (hangi konuları tarayacağını, nasıl özetleyeceğini) açıkça belirten zengin bir AI agent oluşturma promptuna (tanımına) dönüştür. Türkçe yaz. Sadece geliştirilmiş prompt metnini döndür, başka hiçbir açıklama veya yorum ekleme.
+  `;
+
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
+};
+
+module.exports = { parseAgentFromText, enhancePromptText };

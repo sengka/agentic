@@ -9,6 +9,7 @@ export default function BottomNav() {
     { name: "Yeni Ekle", path: "/create-agent", icon: "➕" },
     { name: "Raporlar", path: "/reports", icon: "📋" },
     { name: "Arama", path: "/search", icon: "🔍" },
+    { name: "Profil", path: "/profile", icon: "👤" },
   ];
 
   return (

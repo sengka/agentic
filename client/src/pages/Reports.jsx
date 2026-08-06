@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { useTheme } from "../ThemeContext";
+import Navbar from "../components/Navbar";
 
 const cleanText = (text) => {
   if (!text) return "";
@@ -113,19 +114,7 @@ export default function Reports() {
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900"}`}>
-      <nav className={`${isDark ? "bg-gray-900" : "bg-white border-b border-gray-200"} px-8 py-4 flex justify-between items-center`}>
-        <button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
-  Agentic
-</button>
-        <div className="flex gap-4 items-center">
-          <button onClick={() => navigate("/dashboard")} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
-            Dashboard
-          </button>
-          <button onClick={() => setIsDark(!isDark)} className={`${isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"} transition`}>
-            {isDark ? "☀️" : "🌙"}
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-4xl mx-auto px-8 py-12">
         <h2 className="text-3xl font-bold mb-2">Raporlar</h2>

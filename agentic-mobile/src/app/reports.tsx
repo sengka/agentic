@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, Linking } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, Linking, Share } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -47,6 +47,16 @@ export default function ReportsScreen() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const handleShareReport = async (agentName: string, summary: string) => {
+    try {
+      await Share.share({
+        message: `🤖 Agentic AI - ${agentName} Rapor Özeti:\n\n${cleanText(summary)}`,
+      });
+    } catch (err) {
+      console.error("Paylaşım hatası:", err);
     }
   };
 
@@ -119,7 +129,7 @@ export default function ReportsScreen() {
               </Text>
             </View>
 
-            {/* Feedback Buttons */}
+            {/* Feedback & Share Buttons */}
             <View className="flex-row gap-2 mb-4">
               <TouchableOpacity
                 onPress={() => handleFeedback(item._id, item.feedback, "like")}
@@ -145,6 +155,15 @@ export default function ReportsScreen() {
                 <Text className="text-xs mr-1">👎</Text>
                 <Text className={`text-[10px] font-semibold ${item.feedback === "dislike" ? "text-red-400" : "text-gray-400"}`}>
                   Beğenmedim
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleShareReport(agentName, item.dailySummary)}
+                className="flex-row items-center justify-center px-4 py-2 rounded-xl border bg-slate-950 border-slate-800"
+              >
+                <Text className="text-xs mr-1">📤</Text>
+                <Text className="text-[10px] font-semibold text-indigo-400">
+                  Paylaş
                 </Text>
               </TouchableOpacity>
             </View>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 const EXAMPLES = [
   "Her gün yapay zeka haberlerini ve GitHub trend projelerini takip et, Türkçe özet çıkar",
@@ -12,8 +13,32 @@ const EXAMPLES = [
 export default function CreateAgent() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const handleEnhancePrompt = async () => {
+    if (!userInput.trim()) {
+      setError("Önce geliştirmek istediğiniz kısa bir fikir yazın.");
+      return;
+    }
+    setError("");
+    setEnhancing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        "https://agentic-468i.onrender.com/api/agents/enhance-prompt",
+        { prompt: userInput },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserInput(res.data.enhancedPrompt);
+    } catch (err) {
+      console.error(err);
+      setError("AI zenginleştirme sırasında bir hata oluştu.");
+    } finally {
+      setEnhancing(false);
+    }
+  };
 
   const handleCreate = async () => {
     if (!userInput.trim()) {
@@ -47,14 +72,7 @@ export default function CreateAgent() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <nav className="bg-gray-900 px-8 py-4 flex justify-between items-center">
-        <button onClick={() => navigate("/dashboard")} className="text-xl font-bold text-indigo-500 hover:text-indigo-400 transition">
-          Agentic
-        </button>
-        <button onClick={() => navigate("/dashboard")} className="text-gray-400 hover:text-white">
-          Geri
-        </button>
-      </nav>
+      <Navbar />
 
       <div className="max-w-2xl mx-auto px-8 py-12">
         <h2 className="text-3xl font-bold mb-2">Yeni Agent Oluştur</h2>
@@ -79,6 +97,17 @@ export default function CreateAgent() {
               ⚠️ {error}
             </p>
           )}
+
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={handleEnhancePrompt}
+              disabled={enhancing || loading || !userInput.trim()}
+              className="flex-1 bg-gray-800 hover:bg-gray-700 text-indigo-400 py-2.5 rounded-xl font-semibold text-sm transition disabled:opacity-40 flex items-center justify-center gap-2"
+            >
+              {enhancing && <span className="w-3.5 h-3.5 border-2 border-indigo-400/40 border-t-indigo-400 rounded-full animate-spin" />}
+              {enhancing ? "AI Zenginleştiriyor..." : "✨ AI Geliştir (Gelişmiş Prompt)"}
+            </button>
+          </div>
 
           <button
             onClick={handleCreate}
