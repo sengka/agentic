@@ -5,6 +5,7 @@ import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config";
+import BottomNav from "../components/BottomNav";
 
 interface Agent {
   _id: string;
@@ -339,6 +340,7 @@ export default function DashboardScreen() {
         {/* Extra space for scrolling */}
         <View className="h-10" />
       </ScrollView>
+      <BottomNav />
     </SafeAreaView>
   );
 }
