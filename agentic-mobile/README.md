@@ -46,23 +46,23 @@ Bu mobil uygulama, web arayüzüyle tam senkronize şekilde çalışarak kullan�
 
 ## 📁 Proje Klasör Yapısı
 
-agentic-mobile/
-├── src/
-│ ├── app/ # Sayfalar (Expo Router)
-│ │ ├── _layout.tsx # Kök yapılandırma ve Auth sağlayıcı
-│ │ ├── login.tsx # Giriş Yap sayfası
-│ │ ├── register.tsx # Kayıt Ol sayfası
-│ │ ├── dashboard.tsx # Ajan listesi ve kontrol paneli
-│ │ ├── create-agent.tsx # Yeni ajan ekleme ekranı
-│ │ ├── reports.tsx # Rapor arşivi
-│ │ ├── search.tsx # RAG Arama ve AI Asistanı
-│ │ └── profile.tsx # Profil ve istatistik sayfası
-│ ├── components/
-│ │ └── BottomNav.tsx # 5 Sekmeli şık alt menü bileşeni
-│ ├── context/
-│ │ └── AuthContext.tsx # JWT token ve oturum yönetimi
-│ ├── config.ts # Sunucu URL ayarları
-│ └── global.css # Küresel TailwindCSS stilleri
+    agentic-mobile/
+      src/
+        app/                    Sayfalar (Expo Router)
+          _layout.tsx           Kök yapılandırma ve Auth sağlayıcı
+          login.tsx             Giriş Yap sayfası
+          register.tsx          Kayıt Ol sayfası
+          dashboard.tsx         Ajan listesi ve kontrol paneli
+          create-agent.tsx      Yeni ajan ekleme ekranı
+          reports.tsx           Rapor arşivi
+          search.tsx            RAG Arama ve AI Asistanı
+          profile.tsx           Profil ve istatistik sayfası
+        components/
+          BottomNav.tsx         5 sekmeli alt menü bileşeni
+        context/
+          AuthContext.tsx       JWT token ve oturum yönetimi
+        config.ts                Sunucu URL ayarları
+        global.css                Küresel TailwindCSS stilleri
 
 
 ---
