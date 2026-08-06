@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, Linking } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, Linking } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config";

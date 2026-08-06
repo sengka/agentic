@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Alert, SafeAreaView } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Switch, ActivityIndicator, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import axios from "axios";
 import { io, Socket } from "socket.io-client";
