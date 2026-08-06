@@ -1,2 +1,6 @@
+node_modules/
 server/.env
-node_modules/git push origin main --force
+client/.env
+agentic-mobile/.env
+.DS_Store
+*.log
