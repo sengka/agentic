@@ -1,6 +1,7 @@
 # Agentic 🤖
 
 **Kişisel AI Ekosistem Platformu** — Kullanıcıların doğal dille kendi yapay zeka ajanlarını (AI Agents) tanımladığı; arka planda otonom olarak veri toplayan, RAG (Retrieval-Augmented Generation) tabanlı analiz yapan, e-posta bildirimleri gönderen ve hem **Web** hem de **Mobil** platformlarda anlık senkronizasyon sunan tam teşekküllü bir yapay zeka ekosistemidir.
+> 🌐 **Canlı Backend:** [https://agentic-468i.onrender.com](https://agentic-468i.onrender.com) — Render üzerinde deploy edilmiş, halihazırda çalışan API.  
 
 Bu proje; basit bir RSS takip edici olarak başlayıp, otonom çalışan, yapay zeka tabanlı soru-cevap asistanı barındıran ve canlı socket.io bildirimleri sunan çok platformlu (Web + Mobil) profesyonel bir SaaS ürününe dönüşmüştür.
 
@@ -34,13 +35,13 @@ Bu proje; basit bir RSS takip edici olarak başlayıp, otonom çalışan, yapay 
 
 - **Backend:** Node.js, Express.js, Socket.io, node-cron
 - **Frontend (Web):** React.js (Vite), TailwindCSS, Axios, React Router, Socket.io-client
-- **Mobile (Uygulama):** Expo (React Native), NativeWind (Tailwind v4), Expo Router, React Native Safe Area Context
+- **Mobile (Uygulama):** Expo (React Native), NativeWind (Tailwind v3), Expo Router, React Native Safe Area Context
 - **Veritabanı:** MongoDB (Mongoose) — Embedding vektörleri MongoDB içinde native saklanır ve cosine similarity ile sorgulanır.
 - **Yapay Zeka (AI):**
   - `gemini-2.5-flash` — Doğal dil işleme, özetleme, soru-cevap, prompt geliştirme.
   - `gemini-embedding-001` — Semantik arama için vektör üretimi.
 - **Scraping:** RSS Parser, Cheerio, Axios
-- **E-Posta:** Nodemailer (Brevo SMTP API)
+- **E-Posta:** Brevo HTTP API (axios)
 
 ---
 
@@ -80,8 +81,9 @@ npm install
 MONGO_URI=mongodb://localhost:27017/agentic
 JWT_SECRET=<gizli-anahtar>
 GEMINI_API_KEY=<gemini-api-anahtarı>
-EMAIL_USER=<gmail-adresi>
-EMAIL_PASS=<gmail-uygulama-şifresi>
+BREVO_API_KEY=<brevo-api-anahtarı>
+EMAIL_SENDER_ADDRESS=<doğrulanmış-gönderen-adresi>
+EMAIL_SENDER_NAME=Agentic
 PORT=5000
 ENABLE_CATCHUP=true
 ```
