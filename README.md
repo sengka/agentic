@@ -1,67 +1,46 @@
 # Agentic 🤖
 
-**Kişisel AI Ekosistem Platformu** — Kullanıcılar doğal dille kendi AI agent'larını tanımlar; agent'lar arka planda otomatik olarak veri toplar, RAG tabanlı analiz yapar ve kişiselleştirilmiş özetler sunar.
+**Kişisel AI Ekosistem Platformu** — Kullanıcıların doğal dille kendi yapay zeka ajanlarını (AI Agents) tanımladığı; arka planda otonom olarak veri toplayan, RAG (Retrieval-Augmented Generation) tabanlı analiz yapan, e-posta bildirimleri gönderen ve hem **Web** hem de **Mobil** platformlarda anlık senkronizasyon sunan tam teşekküllü bir yapay zeka ekosistemidir.
 
-Bir RSS/haber sitesi takip edici olarak başlayan proje, zamanla kendini geliştiren, sohbet edilebilen ve otonom çalışan tam bir AI ekosistemine dönüştü.
+Bu proje; basit bir RSS takip edici olarak başlayıp, otonom çalışan, yapay zeka tabanlı soru-cevap asistanı barındıran ve canlı socket.io bildirimleri sunan çok platformlu (Web + Mobil) profesyonel bir SaaS ürününe dönüşmüştür.
 
 ---
 
 ## ✨ Özellikler
 
-### Agent Yönetimi
+### 🤖 Ajan (Agent) Yönetimi
+- **Doğal Dille Ajan Tanımlama:** Gemini API ile kullanıcının serbest metin olarak yazdığı hedeflerden (Örn: *"Döviz kurlarını takip et"*) ajan adı, açıklaması ve anahtar konular otomatik çıkarılır.
+- **Sihirli "AI Geliştir" Sihirbazı (Web & Mobil):** Kullanıcı basit bir tanım yazdığında, tek tıkla prompt Gemini tarafından zenginleştirilerek profesyonel bir ajan komutuna dönüştürülür.
+- **Canlı Çalışma Durumu Takibi:** Ajanlar arka planda çalışırken tarama, embedding, özetleme ve rapor oluşturma aşamaları Socket.io üzerinden hem web hem mobil ekranda canlı olarak izlenebilir.
+- **Gelişmiş Ajan Yönetimi:** Ajanları tek tıkla aktif/pasif yapma, anlık çalıştırma (▶ Run), düzenleme (isim, açıklama, saat, konular) ve silme işlemleri her iki platformdan da yapılabilir.
 
-- **Doğal dille agent oluşturma** — Gemini API ile kullanıcının yazdığı serbest metinden agent adı, açıklaması ve konuları otomatik çıkarılır
-- **Agent düzenleme** — isim, açıklama, konular ve çalışma saati sonradan güncellenebilir
-- **Aktif/Pasif kontrolü** — tek tıkla bir agent'ı duraklat/etkinleştir
-- **Özelleştirilebilir zamanlama** — her agent kendi tercih edilen saatte otomatik çalışır
-- **Kaçırılan çalıştırmayı yakalama** — sunucu her açıldığında, 24 saatten uzun süredir çalışmamış agent'lar otomatik tetiklenir
+### 🌐 Akıllı Veri Toplama & RSS Keşfi
+- **RSS Otomatik Keşif:** Kullanıcı düz bir web adresi girdiğinde, sistem arka planda sitenin `<link>` etiketlerini veya footer sayfalarını tarayarak uygun RSS feed'ini otomatik bulur.
+- **Dengeli Tarama:** Paralel kaynak taraması ve round-robin (dengeli) kaynak seçimiyle tek bir kaynağın raporu domine etmesi önlenir.
+- **Geri Bildirim Döngüsü:** Kullanıcı raporları beğendikçe (👍/👎), o rapora kaynaklık eden sitelerin ağırlığı otomatik olarak artırılır/azaltılır.
 
-### Akıllı Veri Toplama
+### 🧠 RAG ve Akıllı Soru-Cevap (AI Search & Chat)
+- **Vektör Tabanlı Semantik Arama:** Geçmiş raporlar içinde doğal dille anlam bazlı arama yapma yeteneği.
+- **Agentic AI Asistanı:** Yapay zeka, arama sonuçlarındaki tüm raporları tarar ve kullanıcının sorusuna sadece gerçek verilere dayanan, uydurmasız (no-hallucination) bir sentez cevabı sunar.
+- **Mobil Entegrasyon:** Arama sayfasında, hem yapay zekanın özet cevabı (Chatbot) hem de referans aldığı haber kaynakları tek bir şık ekranda birleştirilmiştir.
 
-- **RSS otomatik keşif** — kullanıcı düz bir web adresi girer, sistem arka planda (standart `<link>` etiketi veya site footer'ındaki RSS dizin sayfaları üzerinden) uygun RSS feed'ini otomatik bulur — kullanıcının RSS bilgisine ihtiyacı yoktur
-- **Paralel kaynak taraması** — birden fazla kaynak aynı anda taranır
-- **Kaynak dengeleme (round-robin)** — tek bir kaynağın raporu domine etmesi önlenir
-- **Kaynak test/önizleme** — kaynak eklemeden önce anında test edilebilir
-- **Agent kendini geliştirme** — kullanıcı geri bildirimlerine (beğen/beğenme) göre kaynaklar zamanla ağırlıklı olarak önceliklendirilir
-
-### RAG ve Yapay Zeka
-
-- **Embedding tabanlı semantik arama** — geçmiş raporlar arasında doğal dille anlam bazlı arama
-- **AI destekli soru-cevap** — bulunan içerikler Gemini'ye context olarak verilip, kullanıcının sorusuna sadece gerçek verilere dayanan, uydurma içermeyen bir cevap üretilir
-- **Kalıcı sohbet widget'ı** — uygulamanın her sayfasında erişilebilen, sayfa geçişlerinde hafızasını koruyan sohbet paneli
-- **Haftalık meta-özet** — bir haftalık tüm raporları tek bir üst-düzey sentez haline getiren otomatik özet
-
-### Gerçek Zamanlı Deneyim
-
-- **Socket.io ile canlı takip** — bir agent çalışırken (tarama, embedding, özetleme aşamaları) durum anlık olarak arayüzde gösterilir
-- **Email bildirimleri** — günlük özet otomatik olarak kullanıcının email adresine gönderilir
-
-### Dashboard ve Analitik
-
-- **Aktivite takvimi** — GitHub tarzı ısı haritası, geçmiş kullanım yoğunluğunu görselleştirir; bir güne tıklayınca o günün raporları listelenir
-- **Genel istatistikler** — toplam rapor sayısı, aktif agent oranı, en aktif agent
-- **Agent'a özel rapor geçmişi** — her agent'ın kendi rapor arşivi ayrı görüntülenebilir
+### 📊 Dashboard & Analitik
+- **Aktivite Isı Haritası (Heatmap):** Web arayüzünde GitHub tarzı yeşil kutulardan oluşan kullanım yoğunluğu takvimi.
+- **İstatistik Panelleri:** Toplam ajan, aktif ajan oranı, toplam rapor ve beğeni oranlarını gösteren istatistik paneli.
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React (Vite), TailwindCSS, Socket.io-client, Axios, React Router
-
-**Backend:** Node.js, Express.js, Socket.io, node-cron
-
-**Veritabanı:** MongoDB (Mongoose) — embedding vektörleri de MongoDB içinde native olarak saklanır ve cosine similarity ile aranır
-
-**AI:** Google Gemini API
-
-- `gemini-2.5-flash` — doğal dil işleme, özetleme, soru-cevap
-- `gemini-embedding-001` — semantik arama için embedding üretimi
-
-**Scraping:** RSS Parser, Cheerio, axios
-
-**Auth:** JWT, bcrypt
-
-**Email:** Nodemailer (SMTP)
+- **Backend:** Node.js, Express.js, Socket.io, node-cron
+- **Frontend (Web):** React.js (Vite), TailwindCSS, Axios, React Router, Socket.io-client
+- **Mobile (Uygulama):** Expo (React Native), NativeWind (Tailwind v4), Expo Router, React Native Safe Area Context
+- **Veritabanı:** MongoDB (Mongoose) — Embedding vektörleri MongoDB içinde native saklanır ve cosine similarity ile sorgulanır.
+- **Yapay Zeka (AI):**
+  - `gemini-2.5-flash` — Doğal dil işleme, özetleme, soru-cevap, prompt geliştirme.
+  - `gemini-embedding-001` — Semantik arama için vektör üretimi.
+- **Scraping:** RSS Parser, Cheerio, Axios
+- **E-Posta:** Nodemailer (Brevo SMTP API)
 
 ---
 
@@ -69,66 +48,81 @@ Bir RSS/haber sitesi takip edici olarak başlayan proje, zamanla kendini gelişt
 
 ```
 agentic/
-├── client/                 # React frontend
+├── client/                 # React Web Frontend
 │   └── src/
-│       ├── pages/          # Dashboard, Reports, Search, CreateAgent, vb.
-│       ├── components/     # ChatWidget, ActivityHeatmap
+│       ├── pages/          # Dashboard, Reports, Search, Profile, vb.
+│       ├── components/     # Navbar, ChatWidget, ActivityHeatmap
 │       └── ThemeContext.jsx
-└── server/                 # Node.js backend
+├── agentic-mobile/         # Expo React Native Mobil Uygulama
+│   └── src/
+│       ├── app/            # dashboard, reports, search, profile, create-agent (Tablar)
+│       ├── components/     # BottomNav (5 Sekmeli Menü)
+│       └── context/        # AuthContext (Oturum Yönetimi)
+└── server/                 # Node.js Backend API
     └── src/
-        ├── controllers/    # auth, agent, report controller'ları
-        ├── models/         # User, Agent, Report şemaları
-        ├── routes/
-        ├── services/       # scraper, embedding, agentRunner, scheduler,
-        │                    # searchService, weeklySummaryService, emailService
+        ├── controllers/    # Auth, Agent, Report Controller'ları
+        ├── models/         # User, Agent, Report Şemaları
+        ├── services/       # Gemini, Scraper, Email, Scheduler Servisleri
         └── middleware/
 ```
 
 ---
 
-## 🚀 Kurulum
+## 🚀 Kurulum ve Çalıştırma
 
-### Gereksinimler
-
-- Node.js
-- MongoDB (yerel veya Atlas)
-- Gemini API anahtarı
-- Gmail App Password (email bildirimleri için)
-
-### Backend
-
+### 1. Backend Servisi
 ```bash
 cd server
 npm install
 ```
-
-`.env` dosyası oluştur:
-
-```
+`.env` dosyasını oluşturun:
+```env
 MONGO_URI=mongodb://localhost:27017/agentic
 JWT_SECRET=<gizli-anahtar>
-GEMINI_API_KEY=<gemini-api-anahtarın>
-EMAIL_USER=<gmail-adresin>
+GEMINI_API_KEY=<gemini-api-anahtarı>
+EMAIL_USER=<gmail-adresi>
 EMAIL_PASS=<gmail-uygulama-şifresi>
 PORT=5000
 ENABLE_CATCHUP=true
 ```
-
+Çalıştırmak için:
 ```bash
 node index.js
 ```
 
-### Frontend
-
+### 2. Web Arayüzü
 ```bash
 cd client
 npm install
 npm run dev
 ```
+Uygulama **`http://localhost:5173`** adresinde açılacaktır.
+
+### 3. Mobil Uygulama (Expo)
+```bash
+cd agentic-mobile
+npm install
+```
+Bağlantı ayarı için `src/config.ts` dosyasında `API_URL` adresinin backend sunucunuzu (veya Render adresini) gösterdiğinden emin olun.
+
+#### Geliştirici Modunda Çalıştırma:
+```bash
+npm run android
+```
+
+#### Yerel APK Derleme (Build APK):
+Uygulamayı telefonunuza yüklemek üzere yerel olarak paketlemek için (JDK 17 yüklü olmalıdır):
+```bash
+cd android
+.\gradlew.bat clean
+.\gradlew.bat assembleDebug
+```
+Derlenen APK dosyası şu dizinde oluşacaktır:
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
 ## 👩‍💻 Geliştirici
 
-**Sena Gül Kara** — Samsun Üniversitesi, Yazılım Mühendisliği
+**Sena Gül Kara** — Samsun Üniversitesi, Yazılım Mühendisliği  
 Kodpit bünyesinde staj kapsamında geliştirilmiştir.
