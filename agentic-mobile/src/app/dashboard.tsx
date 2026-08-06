@@ -259,7 +259,7 @@ export default function DashboardScreen() {
                 key={agent._id}
                 style={{ opacity: agent.isActive ? 1 : 0.6 }}
                 className={`bg-slate-900 border ${
-                  isRunning ? "border-indigo-500 shadow-md" : "border-slate-900"
+                  isRunning ? "border-indigo-500" : "border-slate-900"
                 } rounded-3xl p-5 mb-4 overflow-hidden`}
               >
                 {/* Agent Header info */}
