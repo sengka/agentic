@@ -15,10 +15,16 @@ interface SearchResult {
   score: number;
 }
 
+const cleanText = (text: string) => {
+  if (!text) return "";
+  return text.replace(/\*\*/g, "").replace(/\*/g, "").trim();
+};
+
 export default function SearchScreen() {
   const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
@@ -33,10 +39,12 @@ export default function SearchScreen() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResults(res.data.results || []);
+      setAnswer(res.data.answer || null);
     } catch (err: any) {
       console.error("Arama hatası:", err);
       Alert.alert("Hata", "Arama gerçekleştirilirken bir hata oluştu.");
       setResults([]);
+      setAnswer(null);
     } finally {
       setLoading(false);
     }
@@ -126,6 +134,16 @@ export default function SearchScreen() {
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderResultItem}
             showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              answer ? (
+                <View className="bg-indigo-950 border border-indigo-900 rounded-3xl p-5 mb-5">
+                  <Text className="text-indigo-400 text-sm font-bold mb-2.5">🤖 Agentic Asistanı</Text>
+                  <Text className="text-gray-300 text-xs leading-relaxed font-medium">
+                    {cleanText(answer)}
+                  </Text>
+                </View>
+              ) : null
+            }
             ListEmptyComponent={
               searched ? (
                 <View className="bg-slate-900 border border-dashed border-slate-900 rounded-3xl p-8 items-center justify-center my-4">
